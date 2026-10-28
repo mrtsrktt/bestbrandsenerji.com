@@ -14,7 +14,9 @@ The production output is `dist/`. The existing company domain is not modified.
 
 ## Experience
 
-The full-bleed 26-second story shows incoming sunlight over photovoltaic cells, follows collected energy through inverters, transformer, switching equipment and the grid, then follows a free measurement wave continuously into the BESTE/ESBİ inspection hall. There is no white-screen sector transition or Sun photo overlay. It starts automatically and loops. Click the scene to pause/resume; Enter/Space also work. No visible start/play button. The only hero text is a small heading at bottom-left. Reduced motion slows the flight; a photo fallback preserves the page when WebGL is unavailable. Mobile uses a wider field of view and lower render resolution. Desktop adds contact ambient occlusion.
+The full-bleed 26-second base story shows incoming sunlight over photovoltaic cells, follows collected energy through inverters, transformer, switching equipment and the grid, then follows a measurement wave continuously into the BESTE/ESBİ inspection hall. No white-screen sector transition or Sun photo overlay. Autoplay and loop remain; clicking now enters contextual close-up journeys rather than pausing. Users can join collection, inspect energy conversion, follow the grid or examine vehicle measurement. Camera detours join the current pose and return to the exact continuing film pose. Mouse position adds damped parallax. A separate round button pauses/resumes; a return button rejoins the film smoothly. Hotspots and controls support keyboard activation. The small heading stays bottom-left and recedes during close-ups. Reduced motion slows the flight; a photo fallback preserves the page when WebGL is unavailable. This phase targets desktop only; mobile improvements and QA are deferred.
+
+DC cables and energy overlays use the same CurvePath; photon endpoints use the panel's actual tilt transform. Light remains on cell geometry and real conductors. The visualization describes the process without claiming an electrical simulation or that this GES powers the station. Scanned Rock 07 models, textured terrain, curved curbs and fine verge grass add environmental detail. BESTE/ESBİ logos have a larger unobstructed fascia.
 
 Navigation temporarily links to the relevant existing website pages pending the next project phase. The contact and investor URLs were checked against the source website. The English link leads to the existing English homepage; translating the new prototype is outside this first Turkish hero scope.
 
@@ -24,4 +26,4 @@ For repeatable review, `?time=1.5&still=1`, `?time=9&still=1`, `?time=14.5&still
 
 ## Verification
 
-Production build and desktop/mobile browser rendering are checked during implementation, including autoplay, click-to-pause/resume and loop timing. Low-end physical-device performance has not been measured.
+Production build, desktop browser interactions, pause/resume, and camera route entry/exit continuity are checked during implementation. No new mobile verification in this phase. Low-end physical-device performance has not been measured.

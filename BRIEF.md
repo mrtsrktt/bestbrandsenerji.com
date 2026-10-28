@@ -14,7 +14,11 @@ No procedural mountains, simple trees or floating platform. Photographic HDR dis
 
 Brand colors sampled from original logo: dark #406840 and brighter #78b828. Original green logo on white header. One small heading bottom-left.
 
-Playback: automatic on page ready, continuous 26-second loop. Clicking anywhere on the animation pauses, clicking again resumes. No visible start/play button. Keyboard Enter and Space do the same. Slow flight for reduced-motion OS preference; CSS/photo fallback for unavailable WebGL. Keep the bottom-left heading small enough to leave the image dominant.
+Playback: automatic on page ready, continuous 26-second base loop. User-approved interaction replaces click-to-pause: click the panel or “Akışa katıl” to enter a close flight following cells and under-panel DC collection. At the power system, choose “Dönüşümü incele” or “Şebekeye ilerle”; at inspection, choose “Ölçümü izle”. Each detour starts at the current camera pose, ends at the exact continuing film pose, and uses the same clock for camera and energy effects. Mouse position adds restrained, damped viewpoint parallax. Enter/Space activates the scene; hotspots and separate pause/resume/return controls are keyboard accessible. No charging-station scenario. Separate round pause control; no start gate. Slow flight for reduced-motion OS preference; CSS/photo fallback for unavailable WebGL.
+
+Desktop only during this phase. Do not spend implementation or QA effort on mobile until the desktop experience is approved. Existing mobile styles are retained without new mobile work.
+
+Environment polish: scanned CC0 Rock 07 asset, PBR terrain, undulating far ground, curved road curbs and fine verge grasses. No cartoon trees; distant vegetation comes from the photographic HDR environment. BESTE/ESBİ signs enlarged on a dedicated clear fascia; remove the front roof rail that crossed the logos. Electrical light and insulation share identical cable curves, photon endpoints derive from the tilted panel surface transform, and cell effects remain in the panel shader. These are explanatory visual effects, not a quantitative electrical simulation.
 
 Second alternative is recorded in ALTERNATIVES.md and deliberately not implemented now.
 

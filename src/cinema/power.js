@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import {panelSurface,collectionPath,acPath} from './electrical-paths.js';
 
 export function buildPowerSystem(scene,m,assets,u){
   const group=new THREE.Group();scene.add(group);
@@ -71,17 +72,28 @@ export function buildPowerSystem(scene,m,assets,u){
     const curve=new THREE.CatmullRomCurve3(pts.map(v=>new THREE.Vector3(...v)));conductorCurves.push(curve);
     const cable=new THREE.Mesh(new THREE.TubeGeometry(curve,90,.023,4,false),m.darkSteel);group.add(cable);
   }
-  const pulseMaterial=(color,speed,start,end)=>new THREE.ShaderMaterial({uniforms:{uTime:u.time,uStrength:u.energy,uColor:{value:new THREE.Color(color)},uSpeed:{value:speed},uStart:{value:start},uEnd:{value:end}},transparent:true,depthWrite:false,toneMapped:false,blending:THREE.AdditiveBlending,vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec2 vUv;uniform float uTime;uniform vec3 uColor;uniform float uSpeed,uStart,uEnd;void main(){float activation=smoothstep(uStart,uStart+.5,uTime)*(1.-smoothstep(uEnd-.5,uEnd,uTime));float head=fract(max(0.,uTime-uStart)*uSpeed);float d=mod(head-vUv.x+1.,1.);float pulse=exp(-d*22.);gl_FragColor=vec4(uColor*(2.+pulse*4.),(.16+pulse*.84)*activation);}'});
-  const collection=pulseMaterial('#78b828',.42,1.5,12.7),distribution=pulseMaterial('#78b828',.6,10,15.5),photons=pulseMaterial('#ffd07a',.75,0,4.5);
+  const pulseMaterial=(color,speed,start,end)=>new THREE.ShaderMaterial({uniforms:{uTime:u.time,uStrength:u.energy,uColor:{value:new THREE.Color(color)},uSpeed:{value:speed},uStart:{value:start},uEnd:{value:end}},transparent:true,depthWrite:false,toneMapped:false,blending:THREE.AdditiveBlending,vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec2 vUv;uniform float uTime;uniform vec3 uColor;uniform float uSpeed,uStart,uEnd;void main(){float activation=smoothstep(uStart,uStart+.5,uTime)*(1.-smoothstep(uEnd-.5,uEnd,uTime));float head=fract(max(0.,uTime-uStart)*uSpeed);float d=mod(head-vUv.x+1.,1.);float pulse=exp(-d*32.);vec3 light=mix(uColor,vec3(.93,1.,.76),pow(pulse,3.)*.55);gl_FragColor=vec4(light*(1.8+pulse*3.),pulse*.92*activation);}'});
+  const collection=pulseMaterial('#78b828',.34,2.5,10.3),distribution=pulseMaterial('#78b828',.6,10,15.5),photons=pulseMaterial('#ffd8a1',.48,0,4.5);
   // Multiple luminous pulses form a clear sun -> cells -> inverter -> transformer beat.
   for(let i=0;i<15;i++){
-    const end=new THREE.Vector3(-66+(i%5)*8,1.8,24-Math.floor(i/5)*4.35);
-    const begin=end.clone().add(new THREE.Vector3(16,8.3,-74));
-    const curve=new THREE.LineCurve3(begin,end);group.add(new THREE.Mesh(new THREE.TubeGeometry(curve,1,.025,5,false),photons));
+    const end=panelSurface(-66+(i%5)*7.86,1+Math.floor(i/5),.15,.006);
+    const begin=end.clone().add(new THREE.Vector3(16,8.25,-72.5));
+    const curve=new THREE.LineCurve3(begin,end);group.add(new THREE.Mesh(new THREE.TubeGeometry(curve,1,.012,5,false),photons));
   }
-  for(const z of [23.7,15,6.3,-2.4]){
-    const curve=new THREE.CatmullRomCurve3([[-68,1.8,z],[-40,1.8,z],[-12,1.8,z],[1,.2,z],[5,.22,7],[5,.22,0],[12,.22,-4],[15,3,-4]].map(v=>new THREE.Vector3(...v)));
-    group.add(new THREE.Mesh(new THREE.TubeGeometry(curve,130,.033,6,false),collection));
+  // Both the visible insulation and the explanatory light use the SAME curve.
+  // DC is collected beneath the tilted modules, then drops into the cable tray.
+  for(const row of [1,2,3,5,7]){
+    const curve=collectionPath(row);
+    group.add(new THREE.Mesh(new THREE.TubeGeometry(curve,220,.037,6,false),m.rubber));
+    group.add(new THREE.Mesh(new THREE.TubeGeometry(curve,220,.041,6,false),collection));
+  }
+  const ac=acPath();
+  group.add(new THREE.Mesh(new THREE.TubeGeometry(ac,100,.06,8,false),m.rubber));
+  group.add(new THREE.Mesh(new THREE.TubeGeometry(ac,100,.064,8,false),pulseMaterial('#78b828',.35,6.8,11)));
+  // Transformer output overlays the actual bushing-to-gantry leads.
+  for(let phase=0;phase<3;phase++){
+    const curve=new THREE.LineCurve3(new THREE.Vector3(14.1+phase*.9,4.02,-4.4),new THREE.Vector3(11+phase*4,6.42,-13));
+    group.add(new THREE.Mesh(new THREE.TubeGeometry(curve,1,.029,6,false),pulseMaterial('#78b828',.5,8.5,12.5)));
   }
   for(const curve of conductorCurves)group.add(new THREE.Mesh(new THREE.TubeGeometry(curve,100,.045,6,false),distribution));
   return {group};

@@ -14,6 +14,8 @@ import {buildLandscape} from './cinema/environment.js';
 import {buildPowerSystem} from './cinema/power.js';
 import {buildMeasurementBridge} from './cinema/bridge.js';
 import {buildStation} from './cinema/station.js';
+import {createJourney} from './cinema/journey.js';
+import {panelSurface} from './cinema/electrical-paths.js';
 
 const clamp=THREE.MathUtils.clamp;
 const smooth=THREE.MathUtils.smoothstep;
@@ -43,7 +45,7 @@ const stationFlight=[
 function flightTrack(keys){
  return {keys,position:new THREE.CatmullRomCurve3(keys.map(k=>new THREE.Vector3(...k.p)),false,'catmullrom',.25),target:new THREE.CatmullRomCurve3(keys.map(k=>new THREE.Vector3(...k.q)),false,'catmullrom',.25)};
 }
-export async function createWorld(canvas,{reducedMotion,onProgress,onLoad}){
+export async function createWorld(canvas,{reducedMotion,onProgress,onLoad,onInteraction=()=>{}}){
  const mobile=()=>innerWidth<=720;
  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
  const pixelRatio=Math.min(devicePixelRatio,mobile()?1.15:1.35);
@@ -59,12 +61,12 @@ export async function createWorld(canvas,{reducedMotion,onProgress,onLoad}){
  scene.backgroundIntensity=.95;scene.environmentIntensity=.85;
  scene.backgroundBlurriness=.008;scene.fog=new THREE.FogExp2('#bac2bb',.0017);
  const materials=makeMaterials(assets);
- const land=buildLandscape(scene,materials);
+ const land=buildLandscape(scene,materials,assets);
  const solar=buildSolar(scene,materials,uniforms);
  buildPowerSystem(scene,materials,assets,uniforms);
  const station=buildStation(scene,materials,assets,uniforms);
  const bridge=buildMeasurementBridge(scene);
- const ambient=new THREE.HemisphereLight('#dbe9f2','#554a35',.65);scene.add(ambient);
+ const ambient=new THREE.HemisphereLight('#dbe9f2','#756851',1.1);scene.add(ambient);
  const sun=new THREE.DirectionalLight('#ffdda4',2.7);sun.castShadow=true;
  sun.shadow.mapSize.set(mobile()?1024:2048,mobile()?1024:2048);
  Object.assign(sun.shadow.camera,{left:-62,right:62,top:62,bottom:-62,near:1,far:200});
@@ -93,6 +95,15 @@ export async function createWorld(canvas,{reducedMotion,onProgress,onLoad}){
  let filmTime=params.has('time')?clamp(Number(params.get('time'))||0,0,DURATION-.001):0;
  let paused=params.get('still')==='1',hidden=document.hidden,last=performance.now();
  const track=flightTrack([...energyFlight,...stationFlight]);
+ function sampleMain(t){
+  let index=0;while(index<track.keys.length-2&&t>=track.keys[index+1].t)index++;
+  const k0=track.keys[index],k1=track.keys[index+1],fraction=clamp((t-k0.t)/(k1.t-k0.t),0,1),u=(index+fraction)/(track.keys.length-1);
+  return {p:track.position.getPoint(u),q:track.target.getPoint(u),fov:lerp(k0.fov,k1.fov,fraction),roll:lerp(k0.roll,k1.roll,fraction)};
+ }
+ const journey=createJourney(sampleMain);
+ let journeyPose=null,currentPose=sampleMain(filmTime);
+ const pointer=new THREE.Vector2(),pointerTarget=new THREE.Vector2();
+ const projection=new THREE.Vector3(),right=new THREE.Vector3();
  const state={u:0};
  const tl=gsap.timeline({paused:true});
  tl.to(state,{u:1,duration:DURATION,ease:'none'},0);
@@ -102,16 +113,16 @@ export async function createWorld(canvas,{reducedMotion,onProgress,onLoad}){
   t=clamp(t,0,DURATION-.001);tl.time(t,false);uniforms.time.value=t;
   uniforms.energy.value=smooth(t,.25,1.05)*(1-smooth(t,12.8,13.5));
   uniforms.scan.value=smooth(t,16.5,18)*(1-smooth(t,23,25));
-  let index=0;while(index<track.keys.length-2&&t>=track.keys[index+1].t)index++;
-  const k0=track.keys[index],k1=track.keys[index+1];
-  const fraction=clamp((t-k0.t)/(k1.t-k0.t),0,1);
-  const u=(index+fraction)/(track.keys.length-1);
-  camera.position.copy(track.position.getPoint(u));target.copy(track.target.getPoint(u));
-  camera.fov=lerp(k0.fov,k1.fov,fraction)+(mobile()?12:0);
+  currentPose=journeyPose||sampleMain(t);
+  camera.position.copy(currentPose.p);target.copy(currentPose.q);
+  camera.fov=currentPose.fov+(mobile()?12:0);
+  right.copy(target).sub(camera.position).cross(new THREE.Vector3(0,1,0)).normalize();
+  camera.position.addScaledVector(right,pointer.x*(journey.active?.12:.32));
+  camera.position.y+=pointer.y*.12;target.addScaledVector(right,pointer.x*.12);
   // Banking remains restrained, with forward motion and parallax carrying the shot.
-  camera.up.set(0,1,0);camera.lookAt(target);camera.rotateZ(lerp(k0.roll,k1.roll,fraction));
+  camera.up.set(0,1,0);camera.lookAt(target);camera.rotateZ(currentPose.roll||0);
   camera.updateProjectionMatrix();camera.updateMatrixWorld();
-  bridge.update(t,camera);
+  bridge.update(t,camera,!journey.active);
   const carZ=lerp(26,8.0,smooth(t,14,17));
   station.car.position.set(0,.25,carZ);
   station.scanner.visible=t>=17&&t<=25;
@@ -125,6 +136,15 @@ export async function createWorld(canvas,{reducedMotion,onProgress,onLoad}){
   dof.enabled=!mobile()&&((t>1.3&&t<5.5)||(t>17&&t<23));
   dof.uniforms.focus.value=t<13.5?lerp(6,14,smooth(t,0,6)):camera.position.distanceTo(new THREE.Vector3(68,1.3,7));
   canvas.dataset.time=t.toFixed(3);canvas.dataset.paused=String(paused);
+  canvas.dataset.journey=journey.active||'auto';
+  const options=[];
+  if(!journey.active){
+   if(t<6)options.push({action:'join',label:'Akışa katıl',point:panelSurface(clamp(-62+t*8,-62,-12),2)});
+   else if(t<12.5){options.push({action:'convert',label:'Dönüşümü incele',point:t<8?new THREE.Vector3(5,1.5,9):new THREE.Vector3(15,2.5,-5)});options.push({action:'grid',label:'Şebekeye ilerle',point:new THREE.Vector3(15,6,-13)});}
+   else if(t>16&&t<24.5)options.push({action:'inspect',label:'Ölçümü izle',point:new THREE.Vector3(68,1.4,8)});
+  }
+  for(const option of options){projection.copy(option.point).project(camera);option.x=(projection.x*.5+.5)*width;option.y=(-projection.y*.5+.5)*height;option.inView=projection.z<1&&projection.z>-1&&Math.abs(projection.x)<.83&&Math.abs(projection.y)<.65;delete option.point;}
+  onInteraction({active:journey.active,options,width,height});
   onProgress(t<7?0:t<13.5?1:2);
   composer.render();
  }
@@ -134,11 +154,24 @@ export async function createWorld(canvas,{reducedMotion,onProgress,onLoad}){
   const now=Number.isFinite(time)?time:performance.now();
   const dt=Math.max(0,(now-last)/1000);last=now;
   if(hidden)return;
-  if(!paused)filmTime=(filmTime+dt*(reducedMotion?.65:1))%DURATION;
+  pointer.lerp(pointerTarget,1-Math.exp(-dt*4));
+  if(!paused){
+   if(journey.active){journeyPose=journey.update(dt*(reducedMotion?.65:1));filmTime=journeyPose.time;if(journeyPose.done){filmTime=journeyPose.next;journeyPose=null;}}
+   else {journeyPose=null;filmTime=(filmTime+dt*(reducedMotion?.65:1))%DURATION;}
+  }
   const start=performance.now();draw(filmTime);frameMs=lerp(frameMs,performance.now()-start,.04);rendered++;canvas.dataset.renderMs=frameMs.toFixed(1);
  }
  renderer.setAnimationLoop(render);
  document.addEventListener('visibilitychange',()=>{hidden=document.hidden;last=performance.now();});
  canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();renderer.setAnimationLoop(null);canvas.parentElement.classList.add('failed');});
- return {setPaused(value){paused=value;last=performance.now();},seek(value){filmTime=((value%DURATION)+DURATION)%DURATION;draw(filmTime);},seekChapter(index){filmTime=[2,9,19][index];draw(filmTime);},metrics(){return {time:filmTime,paused,rendered,renderMs:Math.round(frameMs*10)/10,panels:solar.panels,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles};},dispose(){renderer.setAnimationLoop(null);observer.disconnect();tl.kill();scene.traverse(obj=>{obj.geometry?.dispose();if(obj.material){for(const material of Array.isArray(obj.material)?obj.material:[obj.material])material.dispose();}});composer.dispose();renderer.dispose();}};
+ return {
+  setPaused(value){paused=value;last=performance.now();},
+  point(x,y){pointerTarget.set(clamp(x,-1,1),clamp(y,-1,1));},
+  interact(action){const choice=action||(filmTime<6?'join':filmTime<12.5?'convert':filmTime>16?'inspect':null);if(!choice)return false;return journey.start(choice,currentPose,filmTime);},
+  returnToFilm(){journey.finish(currentPose,filmTime);},
+  seek(value){journey.clear();journeyPose=null;filmTime=((value%DURATION)+DURATION)%DURATION;draw(filmTime);},
+  seekChapter(index){journey.clear();journeyPose=null;filmTime=[2,9,19][index];draw(filmTime);},
+  metrics(){return {time:filmTime,paused,journey:journey.active,rendered,renderMs:Math.round(frameMs*10)/10,panels:solar.panels,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,camera:camera.position.toArray()};},
+  dispose(){renderer.setAnimationLoop(null);observer.disconnect();tl.kill();scene.traverse(obj=>{obj.geometry?.dispose();if(obj.material){for(const material of Array.isArray(obj.material)?obj.material:[obj.material])material.dispose();}});composer.dispose();renderer.dispose();}
+ };
 }

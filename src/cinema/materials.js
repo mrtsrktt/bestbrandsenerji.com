@@ -8,18 +8,19 @@ export async function loadAssets(renderer,onLoad){
   manager.onProgress=(_url,loaded,total)=>onLoad(Math.min(.92,loaded/Math.max(total,1)*.9));
   const loader=new THREE.TextureLoader(manager);
   const load=(name)=>loader.loadAsync('/assets/'+name);
-  const [sky,asphalt,asphaltNormal,asphaltRough,terrain,terrainNormal,car,besteLogo,esbiLogo,energyLogo,concreteColor,concreteNormal,concreteRough]=await Promise.all([
+  const [sky,asphalt,asphaltNormal,asphaltRough,terrain,terrainNormal,car,besteLogo,esbiLogo,energyLogo,concreteColor,concreteNormal,concreteRough,rock]=await Promise.all([
     new HDRLoader(manager).loadAsync('/assets/landscape.hdr'),
     load('asphalt-color.jpg'),load('asphalt-normal.jpg'),load('asphalt-rough.jpg'),load('terrain-color.jpg'),load('terrain-normal.jpg'),
     new GLTFLoader(manager).loadAsync('/assets/inspection-car.glb'),
     load('beste-logo.webp'),load('esbi-logo.webp'),load('bestbrands-original.png'),
     load('concrete-color.jpg'),load('concrete-normal.jpg'),load('concrete-rough.jpg'),
+    new GLTFLoader(manager).loadAsync('/assets/rock/rock.gltf'),
   ]);
   sky.mapping=THREE.EquirectangularReflectionMapping;
   for(const texture of [asphalt,asphaltNormal,asphaltRough,terrain,terrainNormal,concreteColor,concreteNormal,concreteRough]){texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());}
   asphalt.colorSpace=terrain.colorSpace=THREE.SRGBColorSpace;
   for(const logo of [besteLogo,esbiLogo,energyLogo,concreteColor])logo.colorSpace=THREE.SRGBColorSpace;
-  return {sky,asphalt,asphaltNormal,asphaltRough,terrain,terrainNormal,car,besteLogo,esbiLogo,energyLogo,concreteColor,concreteNormal,concreteRough};
+  return {sky,asphalt,asphaltNormal,asphaltRough,terrain,terrainNormal,car,besteLogo,esbiLogo,energyLogo,concreteColor,concreteNormal,concreteRough,rock};
 }
 
 export function noiseTexture(){

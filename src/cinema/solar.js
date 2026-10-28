@@ -29,12 +29,13 @@ export function buildSolar(scene,materials,uniforms){
       diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.10,.13,.16),max(border,corner)*.8);
       diffuseColor.rgb+=vec3(fingers+bars*.024);
     `).replace('#include <emissivemap_fragment>',`#include <emissivemap_fragment>
-      float waveCenter=-65.+uFilmTime*12.;
-      float wave=exp(-pow((vSolarWorld.x-waveCenter)*.22,2.));
-      float drift=pow(max(0.,sin(vSolarWorld.z*.55-uFilmTime*2.4)),18.);
-      float conduction=(border*.72+bars*.3+gap*.2)*wave;
-      totalEmissiveRadiance+=vec3(1.,.66,.23)*wave*.2*uEnergy;
-      totalEmissiveRadiance+=vec3(.27,.72,.055)*(conduction*6.+wave*.09+drift*border*.35)*uEnergy;
+      float waveCenter=-70.+uFilmTime*12.;
+      float wave=exp(-pow((vSolarWorld.x-waveCenter)*.27,2.));
+      float absorption=wave*(1.-border)*(1.-smoothstep(3.8,5.,uFilmTime));
+      float localFlow=pow(max(0.,sin(vCellUv.y*18.-uFilmTime*5.)),10.);
+      float conduction=bars*wave*(.3+localFlow*.7);
+      totalEmissiveRadiance+=vec3(1.,.68,.28)*absorption*.13*uEnergy;
+      totalEmissiveRadiance+=vec3(.30,.72,.08)*conduction*3.2*uEnergy;
     `);
   };
   const panelGeo=new THREE.PlaneGeometry(1.185,2.335);panelGeo.rotateX(-Math.PI/2);panelGeo.translate(0,.048,0);

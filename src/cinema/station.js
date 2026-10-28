@@ -15,10 +15,8 @@ export function buildStation(scene,m,assets,uniforms){
   box(27.8,.18,31.5,m.white,0,6.65,0);
   // Standing-seam roof and roof-edge flashings.
   for(let x=-13.5;x<=13.5;x+=.45)box(.028,.065,31.5,m.steel,x,6.77,0);
-  box(28.1,.1,.12,m.steel,0,6.78,15.8);
-  box(28,1.7,.35,m.white,0,6.3,15.6);
-  box(28,.09,.37,m.brand,0,7.18,15.6);
-  box(28,.075,.08,m.light,0,5.54,15.83);
+  box(28,2.7,.4,m.white,0,6.6,15.65);
+  box(28,.09,.42,m.brand,0,7.98,15.65);
   for(const x of [-13,-4.5,4.5,13]){
     box(.32,5.65,.4,m.darkSteel,x,2.83,15);
     for(const z of [-10,0,10]){box(.24,6.5,.24,m.darkSteel,x,3.25,z);}
@@ -42,9 +40,9 @@ export function buildStation(scene,m,assets,uniforms){
   for(let x=13.8;x<=20.7;x+=1.15)box(.06,3.9,.07,m.darkSteel,x,2,12.35);
   box(6,.045,.045,m.steel,17.2,2.6,12.4);
   // Actual operating-company logos from Best Brands' public media library.
-  for(const [texture,x,width] of [[assets.besteLogo,-5,4.0],[assets.esbiLogo,5,3.55]]){
+  for(const [texture,x,width] of [[assets.besteLogo,-6.2,7.2],[assets.esbiLogo,6.2,6.7]]){
     const ratio=texture.image.width/texture.image.height;
-    const logo=new THREE.Mesh(new THREE.PlaneGeometry(width,width/ratio),new THREE.MeshBasicMaterial({map:texture,transparent:true,depthWrite:false,toneMapped:false}));logo.position.set(x,6.3,15.8);g.add(logo);
+    const logo=new THREE.Mesh(new THREE.PlaneGeometry(width,width/ratio),new THREE.MeshBasicMaterial({map:texture,transparent:true,depthWrite:false,toneMapped:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));logo.position.set(x,6.65,15.89);g.add(logo);
   }
   // Real floor markings and industrial rollers in all three lanes.
   const yellow=new THREE.MeshStandardMaterial({color:'#c5ac55',roughness:.7});
