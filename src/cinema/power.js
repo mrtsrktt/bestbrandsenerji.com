@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import {panelSurface,collectionPath,acPath} from './electrical-paths.js';
+import {SUN_DIRECTION} from './choreography.js';
 
 export function buildPowerSystem(scene,m,assets,u){
   const group=new THREE.Group();scene.add(group);
@@ -73,12 +74,13 @@ export function buildPowerSystem(scene,m,assets,u){
     const cable=new THREE.Mesh(new THREE.TubeGeometry(curve,90,.023,4,false),m.darkSteel);group.add(cable);
   }
   const pulseMaterial=(color,speed,start,end)=>new THREE.ShaderMaterial({uniforms:{uTime:u.time,uStrength:u.energy,uColor:{value:new THREE.Color(color)},uSpeed:{value:speed},uStart:{value:start},uEnd:{value:end}},transparent:true,depthWrite:false,toneMapped:false,blending:THREE.AdditiveBlending,vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec2 vUv;uniform float uTime;uniform vec3 uColor;uniform float uSpeed,uStart,uEnd;void main(){float activation=smoothstep(uStart,uStart+.5,uTime)*(1.-smoothstep(uEnd-.5,uEnd,uTime));float head=fract(max(0.,uTime-uStart)*uSpeed);float d=mod(head-vUv.x+1.,1.);float pulse=exp(-d*32.);vec3 light=mix(uColor,vec3(.93,1.,.76),pow(pulse,3.)*.55);gl_FragColor=vec4(light*(1.8+pulse*3.),pulse*.92*activation);}'});
-  const collection=pulseMaterial('#78b828',.34,2.5,10.3),distribution=pulseMaterial('#78b828',.6,10,15.5),photons=pulseMaterial('#ffd8a1',.48,0,4.5);
+  const collection=pulseMaterial('#78b828',.19,12.1,17.4),distribution=pulseMaterial('#78b828',.22,19.9,23.6);
+  const photons=new THREE.ShaderMaterial({uniforms:{uTime:u.time},transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false,vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec2 vUv;uniform float uTime;void main(){float activation=smoothstep(.5,1.3,uTime)*(1.-smoothstep(11.4,12.2,uTime));float head=fract(uTime*.58);float pulse=exp(-pow((vUv.x-head)*12.,2.));float feather=pow(sin(vUv.y*3.14159),2.);float approach=smoothstep(.1,.85,vUv.x);gl_FragColor=vec4(vec3(1.,.81,.50)*(1.2+pulse*1.2),(.012+ pulse*.11)*feather*approach*activation);}'});
   // Multiple luminous pulses form a clear sun -> cells -> inverter -> transformer beat.
-  for(let i=0;i<15;i++){
-    const end=panelSurface(-66+(i%5)*7.86,1+Math.floor(i/5),.15,.006);
-    const begin=end.clone().add(new THREE.Vector3(16,8.25,-72.5));
-    const curve=new THREE.LineCurve3(begin,end);group.add(new THREE.Mesh(new THREE.TubeGeometry(curve,1,.012,5,false),photons));
+  for(let i=0;i<24;i++){
+    const end=panelSurface(-68+(i%8)*7.86,1+Math.floor(i/8),.15,.006);
+    const begin=end.clone().addScaledVector(new THREE.Vector3(...SUN_DIRECTION),110);
+    const curve=new THREE.LineCurve3(begin,end);group.add(new THREE.Mesh(new THREE.TubeGeometry(curve,1,.038,8,false),photons));
   }
   // Both the visible insulation and the explanatory light use the SAME curve.
   // DC is collected beneath the tilted modules, then drops into the cable tray.
@@ -89,11 +91,11 @@ export function buildPowerSystem(scene,m,assets,u){
   }
   const ac=acPath();
   group.add(new THREE.Mesh(new THREE.TubeGeometry(ac,100,.06,8,false),m.rubber));
-  group.add(new THREE.Mesh(new THREE.TubeGeometry(ac,100,.064,8,false),pulseMaterial('#78b828',.35,6.8,11)));
+  group.add(new THREE.Mesh(new THREE.TubeGeometry(ac,100,.064,8,false),pulseMaterial('#78b828',.23,14.6,19.0)));
   // Transformer output overlays the actual bushing-to-gantry leads.
   for(let phase=0;phase<3;phase++){
     const curve=new THREE.LineCurve3(new THREE.Vector3(14.1+phase*.9,4.02,-4.4),new THREE.Vector3(11+phase*4,6.42,-13));
-    group.add(new THREE.Mesh(new THREE.TubeGeometry(curve,1,.029,6,false),pulseMaterial('#78b828',.5,8.5,12.5)));
+    group.add(new THREE.Mesh(new THREE.TubeGeometry(curve,1,.029,6,false),pulseMaterial('#78b828',.28,18.2,21.4)));
   }
   for(const curve of conductorCurves)group.add(new THREE.Mesh(new THREE.TubeGeometry(curve,100,.045,6,false),distribution));
   return {group};

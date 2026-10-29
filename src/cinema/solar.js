@@ -3,7 +3,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 
 export function buildSolar(scene,materials,uniforms){
   const columns=58,rows=25,count=columns*rows;
-  const panel=new THREE.MeshPhysicalMaterial({color:'#0b2339',metalness:.48,roughness:.23,clearcoat:1,clearcoatRoughness:.12,envMapIntensity:1.5});
+  const panel=new THREE.MeshPhysicalMaterial({color:'#0b2339',metalness:.48,roughness:.19,clearcoat:1,clearcoatRoughness:.09,envMapIntensity:1.35});
   panel.onBeforeCompile=shader=>{
     shader.uniforms.uFilmTime=uniforms.time;shader.uniforms.uEnergy=uniforms.energy;
     shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec2 vCellUv;varying vec3 vSolarWorld;').replace('#include <uv_vertex>','#include <uv_vertex>\nvCellUv=uv;').replace('#include <worldpos_vertex>',`#include <worldpos_vertex>
@@ -29,13 +29,17 @@ export function buildSolar(scene,materials,uniforms){
       diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.10,.13,.16),max(border,corner)*.8);
       diffuseColor.rgb+=vec3(fingers+bars*.024);
     `).replace('#include <emissivemap_fragment>',`#include <emissivemap_fragment>
-      float waveCenter=-70.+uFilmTime*12.;
-      float wave=exp(-pow((vSolarWorld.x-waveCenter)*.27,2.));
-      float absorption=wave*(1.-border)*(1.-smoothstep(3.8,5.,uFilmTime));
-      float localFlow=pow(max(0.,sin(vCellUv.y*18.-uFilmTime*5.)),10.);
-      float conduction=bars*wave*(.3+localFlow*.7);
-      totalEmissiveRadiance+=vec3(1.,.68,.28)*absorption*.13*uEnergy;
-      totalEmissiveRadiance+=vec3(.30,.72,.08)*conduction*3.2*uEnergy;
+      float waveCenter=-68.+max(0.,uFilmTime-1.2)*6.6;
+      float wave=exp(-pow((vSolarWorld.x-waveCenter)/6.,2.));
+      float rowPhase=floor((28.-vSolarWorld.z)/4.35)*.17;
+      float photonArrival=1.-fract(max(0.,uFilmTime-1.)*.85+rowPhase);
+      float localFlow=exp(-pow((vCellUv.y-photonArrival)*12.,2.));
+      float absorption=wave*(1.-border)*localFlow;
+      // Warm light becomes a restrained white-green current on the actual
+      // metallization. No floating tubes or full-cell neon outlines.
+      float conduction=(bars*.72+gap*.12)*wave*localFlow;
+      totalEmissiveRadiance+=vec3(1.,.75,.40)*absorption*.30*uEnergy;
+      totalEmissiveRadiance+=vec3(.48,.84,.25)*conduction*2.8*uEnergy;
     `);
   };
   const panelGeo=new THREE.PlaneGeometry(1.185,2.335);panelGeo.rotateX(-Math.PI/2);panelGeo.translate(0,.048,0);

@@ -9,7 +9,7 @@ test('autoplay finishes scene one and waits indefinitely for user input',()=>{
   film.tick(100);
   for(let i=0;i<120;i++)film.tick(1);
   assert.equal(film.state.index,0);
-  assert.equal(film.state.time,5.2);
+  assert.equal(film.state.time,12);
   assert.equal(film.state.waiting,true);
 });
 
@@ -27,7 +27,7 @@ test('each click advances exactly one scene without jumping the camera clock',()
   assert.equal(film.state.index,2);
   assert.equal(film.state.waiting,true);
   film.tick(100);
-  assert.equal(film.state.time,25.8);
+  assert.equal(film.state.time,39);
 });
 
 test('scene clocks are finite and monotonic with smooth start and finish',()=>{
@@ -42,10 +42,16 @@ test('scene clocks are finite and monotonic with smooth start and finish',()=>{
 });
 
 test('restart is explicit and completes the return flight before first-scene autoplay',()=>{
-  const film=createScenePlayback(25.8);
+  const film=createScenePlayback(39);
   film.tick(20);assert.equal(film.state.waiting,true);
   film.advance();assert.equal(film.state.restarting,true);
-  film.tick(4);assert.equal(film.state.index,2);assert.equal(film.state.time,25.8);
+  film.tick(4);assert.equal(film.state.index,2);assert.equal(film.state.time,39);
   assert.equal(film.advance(),false);
   film.tick(.7);assert.equal(film.state.index,0);assert.equal(film.state.restarting,false);assert.equal(film.state.waiting,false);assert.equal(film.state.time,0);
+});
+
+test('all scenes last at least ten seconds and the first reserves a long PV flight',()=>{
+  assert.ok(SCENES.every(scene=>scene.duration>=10));
+  assert.equal(SCENES[0].duration,12);
+  assert.equal(SCENES[1].next,'Araç muayene istasyonlarına ilerle');
 });

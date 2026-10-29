@@ -8,19 +8,25 @@ export async function loadAssets(renderer,onLoad){
   manager.onProgress=(_url,loaded,total)=>onLoad(Math.min(.92,loaded/Math.max(total,1)*.9));
   const loader=new THREE.TextureLoader(manager);
   const load=(name)=>loader.loadAsync('/assets/'+name);
-  const [sky,asphalt,asphaltNormal,asphaltRough,terrain,terrainNormal,car,besteLogo,esbiLogo,energyLogo,concreteColor,concreteNormal,concreteRough,rock]=await Promise.all([
-    new HDRLoader(manager).loadAsync('/assets/landscape.hdr'),
+  const [sky,asphalt,asphaltNormal,asphaltRough,terrain,terrainNormal,car,besteLogo,esbiLogo,energyLogo,concreteColor,concreteNormal,concreteRough,rock,inspectorReach,inspectorTablet,inspectorWheel]=await Promise.all([
+    new HDRLoader(manager).setDataType(THREE.FloatType).loadAsync('/assets/clear-sun.hdr'),
     load('asphalt-color.jpg'),load('asphalt-normal.jpg'),load('asphalt-rough.jpg'),load('terrain-color.jpg'),load('terrain-normal.jpg'),
     new GLTFLoader(manager).loadAsync('/assets/inspection-car.glb'),
     load('beste-logo.webp'),load('esbi-logo.webp'),load('bestbrands-original.png'),
     load('concrete-color.jpg'),load('concrete-normal.jpg'),load('concrete-rough.jpg'),
     new GLTFLoader(manager).loadAsync('/assets/rock/rock.gltf'),
+    new GLTFLoader(manager).loadAsync('/assets/people/inspector-reach.glb'),
+    new GLTFLoader(manager).loadAsync('/assets/people/inspector-tablet.glb'),
+    new GLTFLoader(manager).loadAsync('/assets/people/inspector-wheel.glb'),
   ]);
-  sky.mapping=THREE.EquirectangularReflectionMapping;
+  // Keep a crisp solar disk without letting the 24-EV source flood the bloom
+  // pyramid. The directional sun supplies the matching physical key light.
+  for(let i=0;i<sky.image.data.length;i+=4){const maximum=Math.max(sky.image.data[i],sky.image.data[i+1],sky.image.data[i+2]);if(maximum>8){const scale=8/maximum;sky.image.data[i]*=scale;sky.image.data[i+1]*=scale;sky.image.data[i+2]*=scale;}}
+  sky.needsUpdate=true;sky.mapping=THREE.EquirectangularReflectionMapping;
   for(const texture of [asphalt,asphaltNormal,asphaltRough,terrain,terrainNormal,concreteColor,concreteNormal,concreteRough]){texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());}
   asphalt.colorSpace=terrain.colorSpace=THREE.SRGBColorSpace;
   for(const logo of [besteLogo,esbiLogo,energyLogo,concreteColor])logo.colorSpace=THREE.SRGBColorSpace;
-  return {sky,asphalt,asphaltNormal,asphaltRough,terrain,terrainNormal,car,besteLogo,esbiLogo,energyLogo,concreteColor,concreteNormal,concreteRough,rock};
+  return {sky,asphalt,asphaltNormal,asphaltRough,terrain,terrainNormal,car,besteLogo,esbiLogo,energyLogo,concreteColor,concreteNormal,concreteRough,rock,inspectorReach,inspectorTablet,inspectorWheel};
 }
 
 export function noiseTexture(){

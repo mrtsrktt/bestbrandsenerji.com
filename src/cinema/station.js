@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import {buildInspectors} from './inspectors.js';
+import {buildEngineInspection} from './engine-inspection.js';
 
 export function buildStation(scene,m,assets,uniforms){
   const g=new THREE.Group();g.position.set(68,0,-1);scene.add(g);
@@ -59,13 +61,13 @@ export function buildStation(scene,m,assets,uniforms){
     for(let z=-10;z<14;z+=3.5)box(.08,.008,1.4,m.white,x,.09,z);
     // Four-column precision measurement portal.
     for(const s of [-1,1]){
-      box(.28,3.4,.42,m.white,x+s*1.8,1.8,1.5,g,.035);
-      box(.08,2.8,.035,m.greenLight,x+s*1.8,1.9,1.73);
-      box(.38,.5,.5,m.darkSteel,x+s*1.8,.3,1.5,g,.03);
-      box(.16,.16,.06,m.black,x+s*1.8,2.7,1.76,g,.02);
+      box(.28,3.4,.42,m.white,x+s*1.8,1.8,8,g,.035);
+      box(.08,2.8,.035,m.greenLight,x+s*1.8,1.9,8.23);
+      box(.38,.5,.5,m.darkSteel,x+s*1.8,.3,8,g,.03);
+      box(.16,.16,.06,m.black,x+s*1.8,2.7,8.26,g,.02);
     }
-    box(3.9,.24,.45,m.white,x,3.52,1.5,g,.04);
-    box(3.45,.035,.035,m.light,x,3.39,1.74);
+    box(3.9,.24,.45,m.white,x,3.52,8,g,.04);
+    box(3.45,.035,.035,m.light,x,3.39,8.24);
     // Operator terminal and display.
     box(.12,1.35,.12,m.steel,x+2.6,.78,5.8);
     box(.72,.48,.09,m.black,x+2.6,1.62,5.8,g,.035);
@@ -78,13 +80,10 @@ export function buildStation(scene,m,assets,uniforms){
   for(const x of [-8.75,0,8.75]){box(.15,.008,2,m.white,x,.015,22);const shape=new THREE.Shape();shape.moveTo(-.45,0);shape.lineTo(.45,0);shape.lineTo(0,1);shape.closePath();const arrow=new THREE.Mesh(new THREE.ShapeGeometry(shape),m.white);arrow.rotation.x=-Math.PI/2;arrow.position.set(x,.022,20.8);g.add(arrow);}
   // A focused wash of ceiling light inside, with a moving scanner on the car.
   const interior=new THREE.PointLight('#d5e4ed',90,32,2);interior.position.set(0,4.8,5);g.add(interior);
-  const fill=new THREE.PointLight('#c4dbe3',55,26,2);fill.position.set(0,4.6,-6);g.add(fill);
+  const fill=new THREE.PointLight('#c4dbe3',30,26,2);fill.position.set(0,4.6,-6);g.add(fill);
   const scanner=new THREE.Group();scanner.position.set(0,0,8);g.add(scanner);
-  const scanMaterial=new THREE.ShaderMaterial({uniforms:{uTime:uniforms.time,uScan:uniforms.scan},transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,toneMapped:false,vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec2 vUv;uniform float uTime;uniform float uScan;void main(){float edge=pow(abs(vUv.x-.5)*2.,5.);float raster=.3+.7*pow(max(0.,sin(vUv.y*220.+uTime*8.)),6.);gl_FragColor=vec4(vec3(.30,1.,.045),(.045+edge*.13)*raster*uScan);}'});
-  const scanPlane=new THREE.Mesh(new THREE.PlaneGeometry(3.4,2.5),scanMaterial);scanPlane.position.y=1.3;scanner.add(scanPlane);
-  for(const x of [-1.7,1.7])box(.018,2.55,.018,m.greenLight,x,1.3,0,scanner);
-  box(3.4,.018,.018,m.greenLight,0,2.57,0,scanner);
-  box(3.4,.018,.018,m.greenLight,0,.035,0,scanner);
+  // The optical line is projected onto the vehicle material below. There is
+  // no floating luminous rectangle or free waveform in front of the crew.
   // The vehicle uses authored bodywork, tire normals, interior and actual glass.
   const vehicle=assets.car.scene;
   vehicle.updateMatrixWorld(true);
@@ -101,16 +100,25 @@ export function buildStation(scene,m,assets,uniforms){
     if(!obj.material)return;
     const source=Array.isArray(obj.material)?obj.material:[obj.material];
     const altered=source.map(original=>{const mm=original.clone();
-      if(/Paint 1/i.test(mm.name)){mm.color.set('#b0b7bc');mm.metalness=.72;mm.roughness=.28;mm.iridescence=0;mm.clearcoat=1;mm.normalScale?.set(.12,.12);}
-      if(/Paint 2/i.test(mm.name)){mm.color.set('#1d282f');mm.metalness=.75;mm.roughness=.28;mm.iridescence=0;}
+      if(/Paint 1/i.test(mm.name)){mm.color.set('#b0b7bc');mm.metalness=.72;mm.roughness=.24;mm.iridescence=0;mm.clearcoat=1;mm.clearcoatRoughness=.08;mm.normalScale?.set(.025,.025);}
+      if(/Paint 2/i.test(mm.name)){mm.color.set('#1d282f');mm.metalness=.75;mm.roughness=.27;mm.iridescence=0;mm.normalScale?.set(.025,.025);}
       if(mm.map&&/Panel/i.test(mm.name))mm.map=null;
       if(/Tireside/i.test(mm.name)){mm.map=null;mm.color.set('#15191c');}
       if(/Headlight/i.test(mm.name)){mm.emissive?.set('#d5e8f0');mm.emissiveIntensity=1.5;}
       if(/Glass/i.test(mm.name)){mm.color.set('#b7cbd2');mm.roughness=.08;mm.transmission=.6;}
+      if(mm.isMeshStandardMaterial){
+        mm.onBeforeCompile=shader=>{
+          shader.uniforms.uInspectionScan=uniforms.scan;shader.uniforms.uVehicleScanZ=uniforms.vehicleScanZ;
+          shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vInspectionWorld;').replace('#include <worldpos_vertex>','#include <worldpos_vertex>\nvInspectionWorld=(modelMatrix*vec4(transformed,1.)).xyz;');
+          shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vInspectionWorld;uniform float uInspectionScan;uniform float uVehicleScanZ;').replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\nfloat contour=exp(-pow((vInspectionWorld.z-uVehicleScanZ)/.012,2.));totalEmissiveRadiance+=vec3(.30,.72,.08)*contour*uInspectionScan*1.8;');
+        };
+      }
       return mm;});obj.material=Array.isArray(obj.material)?altered:altered[0];
   });
   // Soft contact occlusion grounds the wheels even inside the indirect light.
   const cv=document.createElement('canvas');cv.width=cv.height=128;const ctx=cv.getContext('2d');const grad=ctx.createRadialGradient(64,64,10,64,64,64);grad.addColorStop(0,'rgba(0,0,0,.65)');grad.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=grad;ctx.fillRect(0,0,128,128);
   const shadow=new THREE.Mesh(new THREE.PlaneGeometry(3.5,6.5),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthWrite:false,opacity:.65}));shadow.rotation.x=-Math.PI/2;shadow.position.y=-.16;car.add(shadow);
-  return {group:g,car,scanner,interior};
+  const inspectors=buildInspectors(g,assets,uniforms);
+  const engineInspection=buildEngineInspection(car,vehicle,m);
+  return {group:g,car,scanner,interior,updateInspection(t,close){inspectors.update(t);engineInspection.update(t,close);}};
 }
