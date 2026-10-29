@@ -21,7 +21,7 @@ export async function loadAssets(renderer,onLoad){
   ]);
   // Keep a crisp solar disk without letting the 24-EV source flood the bloom
   // pyramid. The directional sun supplies the matching physical key light.
-  for(let i=0;i<sky.image.data.length;i+=4){const maximum=Math.max(sky.image.data[i],sky.image.data[i+1],sky.image.data[i+2]);if(maximum>8){const scale=8/maximum;sky.image.data[i]*=scale;sky.image.data[i+1]*=scale;sky.image.data[i+2]*=scale;}}
+  for(let i=0;i<sky.image.data.length;i+=4){const maximum=Math.max(sky.image.data[i],sky.image.data[i+1],sky.image.data[i+2]);if(maximum>1.5){const scale=1.5/maximum;sky.image.data[i]*=scale;sky.image.data[i+1]*=scale;sky.image.data[i+2]*=scale;}}
   sky.needsUpdate=true;sky.mapping=THREE.EquirectangularReflectionMapping;
   for(const texture of [asphalt,asphaltNormal,asphaltRough,terrain,terrainNormal,concreteColor,concreteNormal,concreteRough]){texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());}
   asphalt.colorSpace=terrain.colorSpace=THREE.SRGBColorSpace;

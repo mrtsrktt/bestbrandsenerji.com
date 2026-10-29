@@ -49,7 +49,7 @@ export async function createWorld(canvas,{reducedMotion,onProgress,onLoad,onInte
  const sunDirection=new THREE.Vector3(...SUN_DIRECTION);
  // A compact emissive photosphere restores the solar disk that PMREM blurs.
  // It shares the HDR/light direction and remains part of this same 3D sky.
- const sunDisk=new THREE.Mesh(new THREE.SphereGeometry(8,32,24),new THREE.MeshBasicMaterial({color:new THREE.Color('#ffe5a2').multiplyScalar(2),toneMapped:false,fog:false}));sunDisk.frustumCulled=false;scene.add(sunDisk);
+ const sunDisk=new THREE.Mesh(new THREE.SphereGeometry(14,48,32),new THREE.MeshBasicMaterial({color:new THREE.Color('#ffe5a2').multiplyScalar(8),toneMapped:false,fog:false}));sunDisk.frustumCulled=false;scene.add(sunDisk);
  sun.shadow.mapSize.set(mobile()?1024:2048,mobile()?1024:2048);
  Object.assign(sun.shadow.camera,{left:-62,right:62,top:62,bottom:-62,near:1,far:200});
  sun.shadow.bias=-.00013;sun.shadow.normalBias=.035;sun.shadow.radius=3;
