@@ -9,47 +9,48 @@ const params=new URLSearchParams(location.search);
 const wrap=document.querySelector('#scene-wrap');
 const hero=document.querySelector('.hero');
 const pauseButton=document.querySelector('#film-pause');
-const returnButton=document.querySelector('#journey-return');
+const nextButton=document.querySelector('#scene-next');
+const invitation=document.querySelector('.scene-invitation');
+const steps=document.querySelector('.scene-steps');
 const status=document.querySelector('#journey-status');
-const hotspots=[document.querySelector('#journey-primary'),document.querySelector('#journey-secondary')];
 let paused=params.get('still')==='1';
-let previousAction='';
-function updateState(){
+let previousState='';
+function updatePause(){
  pauseButton.setAttribute('aria-pressed',String(paused));
  pauseButton.setAttribute('aria-label',paused?'Animasyona devam et':'Animasyonu duraklat');
  pauseButton.querySelector('path').setAttribute('d',paused?'M7 4l9 6-9 6V4Z':'M7 5v10M13 5v10');
  hero.classList.toggle('is-paused',paused);
 }
-function updateJourney({active,options,width,height}){
- hero.classList.toggle('is-exploring',Boolean(active));
- returnButton.hidden=!active;
- if(active!==previousAction){if(active)status.textContent=({join:'Enerji akışına katıldınız.',convert:'Enerjinin dönüşümünü yakından inceliyorsunuz.',grid:'Şebekeye doğru ilerliyorsunuz.',inspect:'Aracın ölçüm sürecini inceliyorsunuz.'})[active];previousAction=active;}
- wrap.setAttribute('aria-label',active?'Yakın çekim yolculuğu devam ediyor.':options[0]?.label||'Sinematik yolculuk devam ediyor.');
- hotspots.forEach((button,i)=>{
-  const option=options[i];button.hidden=!option;
-  if(!option)return;
-  button.dataset.action=option.action;
-  button.querySelector('.hotspot-label').textContent=option.label;
-  const x=option.inView?option.x:width-220;
-  const y=option.inView?option.y:height*.45+i*70;
-  button.style.transform='translate3d('+Math.max(50,Math.min(width-230,x))+'px,'+Math.max(60,Math.min(height-165,y))+'px,0)';
- });
+function updateScene(state){
+ const {index,name,waiting,restarting,label,target}=state;
+ const key=index+':'+waiting+':'+restarting;
+ if(key===previousState)return;
+ previousState=key;
+ hero.dataset.scene=String(index+1);
+ hero.classList.toggle('is-awaiting',waiting);
+ hero.classList.toggle('is-travelling',restarting||(!waiting&&index>0));
+ invitation.hidden=!waiting;
+ pauseButton.hidden=waiting;
+ nextButton.querySelector('.scene-next-caption').textContent=label;
+ nextButton.setAttribute('aria-label',index===2?'Üç sahneli yolculuğu yeniden başlat':label+' — '+(target+1)+'. sahneyi başlat');
+ steps.setAttribute('aria-label','Sahne '+(index+1)+' / 3');
+ [...steps.children].forEach((el,i)=>{el.classList.toggle('active',i===index);el.classList.toggle('complete',i<index);});
+ wrap.setAttribute('aria-label',name+'. '+(waiting?'Sahne tamamlandı. Sonraki sahne için ilerleme butonuna basın.':restarting?'Başlangıca dönülüyor.':'Animasyon oynuyor.'));
+ status.textContent=restarting?'Başlangıca dönülüyor.':waiting?name+' tamamlandı. '+label+' butonuyla devam edebilirsiniz.':(index+1)+'. sahne başladı: '+name+'.';
 }
 async function start(){
  try{
-  const world=await createWorld(document.querySelector('#world'),{reducedMotion:reduced.matches,onProgress:()=>{},onInteraction:updateJourney,onLoad:progress=>{document.querySelector('#load-progress').style.width=Math.round(progress*100)+'%';}});
-  world.setPaused(paused);wrap.classList.add('ready');document.querySelector('#loading-screen').classList.add('done');document.body.classList.add('is-ready');
-  function toggle(){paused=!paused;world.setPaused(paused);updateState();}
-  function interact(action){if(world.interact(action)){paused=false;world.setPaused(false);updateState();}}
-  wrap.addEventListener('click',()=>interact());
+  const world=await createWorld(document.querySelector('#world'),{reducedMotion:reduced.matches,onProgress:()=>{},onInteraction:updateScene,onLoad:progress=>{document.querySelector('#load-progress').style.width=Math.round(progress*100)+'%';}});
+  world.setPaused(paused);
+  wrap.classList.add('ready');document.querySelector('#loading-screen').classList.add('done');document.body.classList.add('is-ready');
+  pauseButton.addEventListener('click',()=>{paused=!paused;world.setPaused(paused);updatePause();});
+  nextButton.addEventListener('click',()=>{
+   if(world.advance()){paused=false;world.setPaused(false);updatePause();pauseButton.focus({preventScroll:true});}
+  });
   wrap.addEventListener('pointermove',event=>{const r=wrap.getBoundingClientRect();world.point((event.clientX-r.left)/r.width*2-1,1-(event.clientY-r.top)/r.height*2);});
   wrap.addEventListener('pointerleave',()=>world.point(0,0));
-  wrap.addEventListener('keydown',event=>{if(event.key===' '||event.key==='Enter'){event.preventDefault();interact();}});
-  pauseButton.addEventListener('click',toggle);
-  returnButton.addEventListener('click',()=>{world.returnToFilm();paused=false;world.setPaused(false);updateState();wrap.focus({preventScroll:true});});
-  hotspots.forEach(button=>button.addEventListener('click',()=>{interact(button.dataset.action);wrap.focus({preventScroll:true});}));
-  window.heroReview={seek:world.seek,pause:()=>{paused=true;world.setPaused(true);updateState();},metrics:world.metrics};
-  updateState();
- }catch(error){console.error('Scene initialization failed',error);wrap.classList.add('ready','failed');document.querySelector('#loading-screen').classList.add('done');wrap.removeAttribute('role');wrap.removeAttribute('tabindex');document.querySelector('.journey-toolbar').hidden=true;}
+  window.heroReview={seek:world.seek,pause:()=>{paused=true;world.setPaused(true);updatePause();},metrics:world.metrics};
+  updatePause();
+ }catch(error){console.error('Scene initialization failed',error);wrap.classList.add('ready','failed');document.querySelector('#loading-screen').classList.add('done');invitation.hidden=true;document.querySelector('.journey-toolbar').hidden=true;status.textContent='Animasyon yüklenemedi.';}
 }
 start();

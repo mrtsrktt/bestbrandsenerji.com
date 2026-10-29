@@ -7,15 +7,13 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
-import gsap from 'gsap';
 import {loadAssets,makeMaterials} from './cinema/materials.js';
 import {buildSolar} from './cinema/solar.js';
 import {buildLandscape} from './cinema/environment.js';
 import {buildPowerSystem} from './cinema/power.js';
 import {buildMeasurementBridge} from './cinema/bridge.js';
 import {buildStation} from './cinema/station.js';
-import {createJourney} from './cinema/journey.js';
-import {panelSurface} from './cinema/electrical-paths.js';
+import {createScenePlayback,sceneEase} from './cinema/scene-playback.js';
 
 const clamp=THREE.MathUtils.clamp;
 const smooth=THREE.MathUtils.smoothstep;
@@ -100,29 +98,40 @@ export async function createWorld(canvas,{reducedMotion,onProgress,onLoad,onInte
   const k0=track.keys[index],k1=track.keys[index+1],fraction=clamp((t-k0.t)/(k1.t-k0.t),0,1),u=(index+fraction)/(track.keys.length-1);
   return {p:track.position.getPoint(u),q:track.target.getPoint(u),fov:lerp(k0.fov,k1.fov,fraction),roll:lerp(k0.roll,k1.roll,fraction)};
  }
- const journey=createJourney(sampleMain);
- let journeyPose=null,currentPose=sampleMain(filmTime);
+ const playback=createScenePlayback(filmTime);
+ let sceneState=playback.state,currentPose=sampleMain(filmTime);
+ const returnStart=sampleMain(25.8),returnEnd=sampleMain(0);
+ const returnFlight=flightTrack([
+  {t:0,p:returnStart.p.toArray(),q:returnStart.q.toArray(),fov:52,roll:0},
+  {t:1,p:[83,27,49],q:[48,4,6],fov:59,roll:-.025},
+  {t:2,p:[15,38,53],q:[-10,1,0],fov:57,roll:-.015},
+  {t:3,p:[-43,18,42],q:[-45,3,17],fov:53,roll:0},
+  {t:4,p:returnEnd.p.toArray(),q:returnEnd.q.toArray(),fov:returnEnd.fov,roll:0},
+ ]);
  const pointer=new THREE.Vector2(),pointerTarget=new THREE.Vector2();
- const projection=new THREE.Vector3(),right=new THREE.Vector3();
- const state={u:0};
- const tl=gsap.timeline({paused:true});
- tl.to(state,{u:1,duration:DURATION,ease:'none'},0);
+ const right=new THREE.Vector3();
  let rendered=0,frameMs=0;
  const target=new THREE.Vector3();
  function draw(t){
-  t=clamp(t,0,DURATION-.001);tl.time(t,false);uniforms.time.value=t;
+  t=clamp(t,0,DURATION-.001);uniforms.time.value=t;
   uniforms.energy.value=smooth(t,.25,1.05)*(1-smooth(t,12.8,13.5));
   uniforms.scan.value=smooth(t,16.5,18)*(1-smooth(t,23,25));
-  currentPose=journeyPose||sampleMain(t);
+  currentPose=sampleMain(t);
+  if(sceneState.restarting){
+   const s=sceneEase(clamp(sceneState.restartProgress,0,1));
+   currentPose={p:returnFlight.position.getPoint(s),q:returnFlight.target.getPoint(s),fov:lerp(returnStart.fov,returnEnd.fov,s)+Math.sin(s*Math.PI)*6,roll:-Math.sin(s*Math.PI)*.018};
+  }
   camera.position.copy(currentPose.p);target.copy(currentPose.q);
-  camera.fov=currentPose.fov+(mobile()?12:0);
+  const transition=!sceneState.waiting&&!sceneState.restarting&&sceneState.index>0?Math.sin(clamp(sceneState.progress/.28,0,1)*Math.PI):0;
+  camera.fov=currentPose.fov+(mobile()?12:0)+transition*3;
   right.copy(target).sub(camera.position).cross(new THREE.Vector3(0,1,0)).normalize();
-  camera.position.addScaledVector(right,pointer.x*(journey.active?.12:.32));
+  camera.position.addScaledVector(right,pointer.x*.25);
   camera.position.y+=pointer.y*.12;target.addScaledVector(right,pointer.x*.12);
   // Banking remains restrained, with forward motion and parallax carrying the shot.
   camera.up.set(0,1,0);camera.lookAt(target);camera.rotateZ(currentPose.roll||0);
   camera.updateProjectionMatrix();camera.updateMatrixWorld();
-  bridge.update(t,camera,!journey.active);
+  bridge.update(t,camera,!sceneState.restarting);
+  bloom.strength=.29+transition*.10;
   const carZ=lerp(26,8.0,smooth(t,14,17));
   station.car.position.set(0,.25,carZ);
   station.scanner.visible=t>=17&&t<=25;
@@ -136,16 +145,10 @@ export async function createWorld(canvas,{reducedMotion,onProgress,onLoad,onInte
   dof.enabled=!mobile()&&((t>1.3&&t<5.5)||(t>17&&t<23));
   dof.uniforms.focus.value=t<13.5?lerp(6,14,smooth(t,0,6)):camera.position.distanceTo(new THREE.Vector3(68,1.3,7));
   canvas.dataset.time=t.toFixed(3);canvas.dataset.paused=String(paused);
-  canvas.dataset.journey=journey.active||'auto';
-  const options=[];
-  if(!journey.active){
-   if(t<6)options.push({action:'join',label:'Akışa katıl',point:panelSurface(clamp(-62+t*8,-62,-12),2)});
-   else if(t<12.5){options.push({action:'convert',label:'Dönüşümü incele',point:t<8?new THREE.Vector3(5,1.5,9):new THREE.Vector3(15,2.5,-5)});options.push({action:'grid',label:'Şebekeye ilerle',point:new THREE.Vector3(15,6,-13)});}
-   else if(t>16&&t<24.5)options.push({action:'inspect',label:'Ölçümü izle',point:new THREE.Vector3(68,1.4,8)});
-  }
-  for(const option of options){projection.copy(option.point).project(camera);option.x=(projection.x*.5+.5)*width;option.y=(-projection.y*.5+.5)*height;option.inView=projection.z<1&&projection.z>-1&&Math.abs(projection.x)<.83&&Math.abs(projection.y)<.65;delete option.point;}
-  onInteraction({active:journey.active,options,width,height});
-  onProgress(t<7?0:t<13.5?1:2);
+  canvas.dataset.scene=String(sceneState.index+1);canvas.dataset.waiting=String(sceneState.waiting);
+  canvas.dataset.phase=sceneState.restarting?'returning':sceneState.waiting?'awaiting-input':'playing';
+  onInteraction({...sceneState,paused});
+  onProgress(sceneState.index);
   composer.render();
  }
  // Upload and compile before fading the loading cover; no blank first frame.
@@ -156,8 +159,7 @@ export async function createWorld(canvas,{reducedMotion,onProgress,onLoad,onInte
   if(hidden)return;
   pointer.lerp(pointerTarget,1-Math.exp(-dt*4));
   if(!paused){
-   if(journey.active){journeyPose=journey.update(dt*(reducedMotion?.65:1));filmTime=journeyPose.time;if(journeyPose.done){filmTime=journeyPose.next;journeyPose=null;}}
-   else {journeyPose=null;filmTime=(filmTime+dt*(reducedMotion?.65:1))%DURATION;}
+   sceneState=playback.tick(dt*(reducedMotion?.65:1));filmTime=sceneState.time;
   }
   const start=performance.now();draw(filmTime);frameMs=lerp(frameMs,performance.now()-start,.04);rendered++;canvas.dataset.renderMs=frameMs.toFixed(1);
  }
@@ -167,11 +169,9 @@ export async function createWorld(canvas,{reducedMotion,onProgress,onLoad,onInte
  return {
   setPaused(value){paused=value;last=performance.now();},
   point(x,y){pointerTarget.set(clamp(x,-1,1),clamp(y,-1,1));},
-  interact(action){const choice=action||(filmTime<6?'join':filmTime<12.5?'convert':filmTime>16?'inspect':null);if(!choice)return false;return journey.start(choice,currentPose,filmTime);},
-  returnToFilm(){journey.finish(currentPose,filmTime);},
-  seek(value){journey.clear();journeyPose=null;filmTime=((value%DURATION)+DURATION)%DURATION;draw(filmTime);},
-  seekChapter(index){journey.clear();journeyPose=null;filmTime=[2,9,19][index];draw(filmTime);},
-  metrics(){return {time:filmTime,paused,journey:journey.active,rendered,renderMs:Math.round(frameMs*10)/10,panels:solar.panels,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,camera:camera.position.toArray()};},
-  dispose(){renderer.setAnimationLoop(null);observer.disconnect();tl.kill();scene.traverse(obj=>{obj.geometry?.dispose();if(obj.material){for(const material of Array.isArray(obj.material)?obj.material:[obj.material])material.dispose();}});composer.dispose();renderer.dispose();}
+  advance(){const accepted=playback.advance();if(accepted){sceneState=playback.state;last=performance.now();draw(filmTime);}return accepted;},
+  seek(value){playback.seek(value);sceneState=playback.state;filmTime=sceneState.time;draw(filmTime);},
+  metrics(){return {time:filmTime,paused,scene:sceneState.index+1,waiting:sceneState.waiting,restarting:sceneState.restarting,rendered,renderMs:Math.round(frameMs*10)/10,panels:solar.panels,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,camera:camera.position.toArray()};},
+  dispose(){renderer.setAnimationLoop(null);observer.disconnect();scene.traverse(obj=>{obj.geometry?.dispose();if(obj.material){for(const material of Array.isArray(obj.material)?obj.material:[obj.material])material.dispose();}});composer.dispose();renderer.dispose();}
  };
 }
