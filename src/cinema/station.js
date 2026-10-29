@@ -61,13 +61,13 @@ export function buildStation(scene,m,assets,uniforms){
     for(let z=-10;z<14;z+=3.5)box(.08,.008,1.4,m.white,x,.09,z);
     // Four-column precision measurement portal.
     for(const s of [-1,1]){
-      box(.28,3.4,.42,m.white,x+s*1.8,1.8,8,g,.035);
-      box(.08,2.8,.035,m.greenLight,x+s*1.8,1.9,8.23);
-      box(.38,.5,.5,m.darkSteel,x+s*1.8,.3,8,g,.03);
-      box(.16,.16,.06,m.black,x+s*1.8,2.7,8.26,g,.02);
+      box(.28,3.4,.42,m.white,x+s*1.8,1.8,10.7,g,.035);
+      box(.08,2.8,.035,m.greenLight,x+s*1.8,1.9,10.93);
+      box(.38,.5,.5,m.darkSteel,x+s*1.8,.3,10.7,g,.03);
+      box(.16,.16,.06,m.black,x+s*1.8,2.7,10.96,g,.02);
     }
-    box(3.9,.24,.45,m.white,x,3.52,8,g,.04);
-    box(3.45,.035,.035,m.light,x,3.39,8.24);
+    box(3.9,.24,.45,m.white,x,3.52,10.7,g,.04);
+    box(3.45,.035,.035,m.light,x,3.39,10.94);
     // Operator terminal and display.
     box(.12,1.35,.12,m.steel,x+2.6,.78,5.8);
     box(.72,.48,.09,m.black,x+2.6,1.62,5.8,g,.035);
