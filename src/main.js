@@ -8,6 +8,7 @@ const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 const params=new URLSearchParams(location.search);
 const wrap=document.querySelector('#scene-wrap');
 const hero=document.querySelector('.hero');
+hero.dataset.instance=crypto.randomUUID();
 const pauseButton=document.querySelector('#film-pause');
 const nextButton=document.querySelector('#scene-next');
 const invitation=document.querySelector('.scene-invitation');
@@ -32,6 +33,7 @@ function updateScene(state){
  invitation.hidden=!waiting;
  pauseButton.hidden=waiting;
  nextButton.querySelector('.scene-next-caption').textContent=label;
+ nextButton.dataset.nextScene=String(target);
  nextButton.setAttribute('aria-label',index===2?'Üç sahneli yolculuğu yeniden başlat':label+' — '+(target+1)+'. sahneyi başlat');
  steps.setAttribute('aria-label','Sahne '+(index+1)+' / 3');
  [...steps.children].forEach((el,i)=>{el.classList.toggle('active',i===index);el.classList.toggle('complete',i<index);});
@@ -44,8 +46,9 @@ async function start(){
   world.setPaused(paused);
   wrap.classList.add('ready');document.querySelector('#loading-screen').classList.add('done');document.body.classList.add('is-ready');
   pauseButton.addEventListener('click',()=>{paused=!paused;world.setPaused(paused);updatePause();});
-  nextButton.addEventListener('click',()=>{
-   if(world.advance()){paused=false;world.setPaused(false);updatePause();pauseButton.focus({preventScroll:true});}
+  nextButton.addEventListener('click',event=>{
+   event.preventDefault();event.stopPropagation();
+   if(world.advance(Number(nextButton.dataset.nextScene))){paused=false;world.setPaused(false);updatePause();pauseButton.focus({preventScroll:true});}
   });
   wrap.addEventListener('pointermove',event=>{const r=wrap.getBoundingClientRect();world.point((event.clientX-r.left)/r.width*2-1,1-(event.clientY-r.top)/r.height*2);});
   wrap.addEventListener('pointerleave',()=>world.point(0,0));

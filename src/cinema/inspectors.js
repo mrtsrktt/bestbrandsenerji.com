@@ -48,6 +48,8 @@ export function buildInspectors(parent,assets,u){
     const contact=new THREE.Mesh(new THREE.PlaneGeometry(.85,1.1),contactMaterial);contact.rotation.x=-Math.PI/2;contact.position.set(x,.087,z);crew.add(contact);
   }
   // A focused inspection torch illuminates the real front brake assembly.
-  const torch=new THREE.SpotLight('#edf4f4',12,3.5,.25,.7,1.4);torch.position.set(-1.30,.85,6.45);torch.target.position.set(-.95,.64,6.6);crew.add(torch,torch.target);
+  // Keep the light in the render light list even while crew geometry is hidden.
+  // Changing NUM_SPOT_LIGHTS halfway through the film recompiles every PBR material.
+  const torch=new THREE.SpotLight('#edf4f4',0,3.5,.25,.7,1.4);torch.position.set(-1.30,.85,6.45);torch.target.position.set(-.95,.64,6.6);parent.add(torch,torch.target);
   return {crew,update(t){crew.visible=t>=24.8;torch.intensity=THREE.MathUtils.smoothstep(t,27.4,28.2)*(1-THREE.MathUtils.smoothstep(t,30.2,30.8))*18;}};
 }

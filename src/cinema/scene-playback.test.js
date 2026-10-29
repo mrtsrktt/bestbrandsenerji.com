@@ -55,3 +55,14 @@ test('all scenes last at least ten seconds and the first reserves a long PV flig
   assert.equal(SCENES[0].duration,12);
   assert.equal(SCENES[1].next,'Araç muayene istasyonlarına ilerle');
 });
+
+test('a stale next-scene request cannot restart or skip the film',()=>{
+  const film=createScenePlayback();film.tick(100);
+  assert.equal(film.advance(0),false);assert.equal(film.state.index,0);
+  assert.equal(film.advance(1),true);assert.equal(film.state.time,12);
+  for(let i=0;i<20;i++)assert.equal(film.advance(1),false);
+  film.tick(100);assert.equal(film.state.index,1);
+  assert.equal(film.advance(0),false);assert.equal(film.advance(1),false);
+  assert.equal(film.state.time,23);assert.equal(film.advance(2),true);
+  assert.equal(film.state.index,2);assert.equal(film.state.time,23);
+});

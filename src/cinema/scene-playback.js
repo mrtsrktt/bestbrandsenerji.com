@@ -24,7 +24,7 @@ export function createScenePlayback(initialTime=0){
       if(!waiting){elapsed=Math.min(SCENES[index].duration,elapsed+Math.max(0,dt));if(elapsed>=SCENES[index].duration)waiting=true;}
       return snapshot();
     },
-    advance(){if(!waiting||restarting)return false;if(index===2){restarting=true;restartElapsed=0;waiting=false;}else{index++;elapsed=0;waiting=false;}return true;},
+    advance(target=SCENES[index].target){if(!waiting||restarting||target!==SCENES[index].target)return false;if(index===2){restarting=true;restartElapsed=0;waiting=false;}else{index++;elapsed=0;waiting=false;}return true;},
     seek,
     get state(){return snapshot();},
   };

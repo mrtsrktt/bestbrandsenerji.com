@@ -105,7 +105,7 @@ export function buildStation(scene,m,assets,uniforms){
       if(mm.map&&/Panel/i.test(mm.name))mm.map=null;
       if(/Tireside/i.test(mm.name)){mm.map=null;mm.color.set('#15191c');}
       if(/Headlight/i.test(mm.name)){mm.emissive?.set('#d5e8f0');mm.emissiveIntensity=1.5;}
-      if(/Glass/i.test(mm.name)){mm.color.set('#b7cbd2');mm.roughness=.08;mm.transmission=.6;}
+      if(/Glass/i.test(mm.name)||mm.transmission>0){mm.color.set('#a8bdc5');mm.roughness=.08;mm.transmission=0;mm.transparent=true;mm.opacity=.36;mm.depthWrite=false;mm.envMapIntensity=1.1;}
       if(mm.isMeshStandardMaterial){
         mm.onBeforeCompile=shader=>{
           shader.uniforms.uInspectionScan=uniforms.scan;shader.uniforms.uVehicleScanZ=uniforms.vehicleScanZ;

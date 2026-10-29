@@ -9,6 +9,8 @@ export function buildEngineInspection(car,vehicle,m){
   hood?.traverse(obj=>{if(obj.isMesh)for(const material of Array.isArray(obj.material)?obj.material:[obj.material])hoodMaterials.push({material,opacity:material.opacity,transparent:material.transparent,depthWrite:material.depthWrite});});
   const engine=vehicle.getObjectByName('Engine');
   engine?.traverse(obj=>{if(obj.isMesh)for(const material of Array.isArray(obj.material)?obj.material:[obj.material])engineMaterials.push({material,opacity:material.opacity});});
+  // Opacity may animate; the opaque/transparent shader variant must stay fixed.
+  for(const entry of [...hoodMaterials,...engineMaterials])entry.material.transparent=true;
   vehicle.traverse(obj=>{if(obj.isMesh&&/WheelFront.*Brake/.test(obj.name)){for(const material of Array.isArray(obj.material)?obj.material:[obj.material])brakes.push(material);}});
   const assembly=new THREE.Group();assembly.position.set(0,.65,1.90);car.add(assembly);
   const aluminum=new THREE.MeshPhysicalMaterial({color:'#a6b1b4',metalness:.88,roughness:.23,clearcoat:.2});
@@ -39,11 +41,11 @@ export function buildEngineInspection(car,vehicle,m){
   for(const x of [-.49,.49])for(const z of [-.25,.25])cylinder(.018,.025,aluminum,x,.22,z);
   pipe([[-.56,.04,.2],[-.59,.17,.27],[-.32,.25,.31],[.20,.22,.32],[.51,.10,.24]],.027,black);
   pipe([[-.52,-.16,-.2],[-.57,-.12,-.25],[-.55,.12,-.29]],.018,copper);
-  const diagnosticLight=new THREE.PointLight('#c9e5df',0,1.6,2);diagnosticLight.position.set(0,.40,.1);assembly.add(diagnosticLight);
+  const diagnosticLight=new THREE.PointLight('#c9e5df',0,1.6,2);diagnosticLight.position.set(0,1.05,2);car.add(diagnosticLight);
   return {update(t,close){
     const reveal=THREE.MathUtils.smoothstep(t,29.8,31.4)*(1-THREE.MathUtils.smoothstep(t,34.3,35.5));
-    for(const s of hoodMaterials){s.material.transparent=reveal>0||s.transparent;s.material.opacity=s.opacity*(1-reveal*.93);s.material.depthWrite=reveal>.01?false:s.depthWrite;}
-    for(const s of engineMaterials){s.material.transparent=reveal>.1;s.material.opacity=s.opacity*(1-reveal*.88);s.material.depthWrite=reveal<.1;}
+    for(const s of hoodMaterials){s.material.opacity=s.opacity*(1-reveal*.93);s.material.depthWrite=reveal>.01?false:s.depthWrite;}
+    for(const s of engineMaterials){s.material.opacity=s.opacity*(1-reveal*.88);s.material.depthWrite=reveal<.1;}
     assembly.visible=reveal>.05;diagnosticLight.intensity=reveal*1.8;
     for(let i=0;i<4;i++){const travel=Math.sin((t-31)*2.1+(i%2)*Math.PI)*.045;pistons[i].position.y=travel;rings[i].position.y=travel+.02;rods[i].position.y=travel*.5-.1;}
     crank.rotation.x=(t-31)*2.1;

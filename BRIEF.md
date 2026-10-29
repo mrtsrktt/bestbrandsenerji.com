@@ -18,6 +18,10 @@ Playback (latest 2026-10-29 revision): exactly THREE user-gated scenes, each at 
 
 Desktop only during this phase. Do not spend implementation or QA effort on mobile until the desktop experience is approved. Existing mobile styles are retained without new mobile work.
 
+Latest feedback revision: make the solar disk larger and energy transfer explicit, not faint incidental lines. Strengthen warm rays arriving at cells, surface-bound conversion, and a white/green ribbon that travels with the drone. DC arrival visibly energizes the converter, AC arrival gives the transformer a controlled green edge/fins/ground glow, then a bright pulse travels along the actual grid conductors. Use staged, single forward pulses instead of unrelated repeating loops.
+
+Remove shot stalls: stable global light counts and transparent shader variants; precompile and pre-render all shot states before autoplay; remove timed depth-of-field/AO pass switches; cache sector shadows; use native desktop resolution and reflective non-transmission car glazing. Interpolate the camera with time-correct Hermite derivatives and normalized aim vectors. Next-scene requests specify their target and cannot skip/restart the controller. Deliver a separate production preview on 4173, without automatic development reloads; preserve the user's Hermes development server and files.
+
 Environment polish: scanned CC0 Rock 07 asset, PBR terrain, undulating far ground, curved road curbs and fine verge grasses. No cartoon trees; distant vegetation comes from the photographic HDR environment. BESTE/ESBİ signs enlarged on a dedicated clear fascia; remove the front roof rail that crossed the logos. Electrical light and insulation share identical cable curves, photon endpoints derive from the tilted panel surface transform, and cell effects remain in the panel shader. These are explanatory visual effects, not a quantitative electrical simulation.
 
 Second alternative is recorded in ALTERNATIVES.md and deliberately not implemented now.

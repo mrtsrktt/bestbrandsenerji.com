@@ -34,12 +34,18 @@ export function buildSolar(scene,materials,uniforms){
       float rowPhase=floor((28.-vSolarWorld.z)/4.35)*.17;
       float photonArrival=1.-fract(max(0.,uFilmTime-1.)*.85+rowPhase);
       float localFlow=exp(-pow((vCellUv.y-photonArrival)*12.,2.));
-      float absorption=wave*(1.-border)*localFlow;
+      float absorption=wave*(1.-border)*(.28+localFlow*.72);
       // Warm light becomes a restrained white-green current on the actual
       // metallization. No floating tubes or full-cell neon outlines.
       float conduction=(bars*.72+gap*.12)*wave*localFlow;
-      totalEmissiveRadiance+=vec3(1.,.75,.40)*absorption*.30*uEnergy;
-      totalEmissiveRadiance+=vec3(.48,.84,.25)*conduction*2.8*uEnergy;
+      float process=smoothstep(1.7,2.7,uFilmTime);
+      float heroRow=exp(-pow((vSolarWorld.z-23.65)/1.3,2.));
+      float ribbon=aaLine(vCellUv.y-.55,.012)*heroRow;
+      float head=exp(-pow((vSolarWorld.x-waveCenter)/1.45,2.));
+      float trail=exp(-max(waveCenter-vSolarWorld.x,0.)/10.)*step(vSolarWorld.x,waveCenter);
+      totalEmissiveRadiance+=vec3(1.,.72,.27)*absorption*.70*uEnergy;
+      totalEmissiveRadiance+=vec3(.48,.88,.18)*conduction*7.5*uEnergy*process;
+      totalEmissiveRadiance+=(vec3(.30,.9,.08)*ribbon*trail*5.5+vec3(1.,1.,.72)*ribbon*head*8.)*uEnergy*process;
     `);
   };
   const panelGeo=new THREE.PlaneGeometry(1.185,2.335);panelGeo.rotateX(-Math.PI/2);panelGeo.translate(0,.048,0);
