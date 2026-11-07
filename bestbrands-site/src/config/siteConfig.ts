@@ -13,8 +13,8 @@ export const siteConfig = {
     height: 82,
   },
   hero: {
-    videoSrc: '/assets/bestbrands-hero.mp4',
-    posterSrc: '/assets/bestbrands-hero-poster.jpg',
+    videoSrc: '/assets/bestbrands-hero-v4.mp4',
+    posterSrc: '/assets/bestbrands-hero-v4-poster.jpg',
     accessibleTitle: 'Best Brands Enerji - Yenilenebilir Enerji ve Geleceğin Altyapı Yatırımları',
     playbackSettings: {
       muted: true,
