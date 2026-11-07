@@ -1,0 +1,11 @@
+{
+  "functions": {
+    "api/kap-disclosures.js": {
+      "maxDuration": 30,
+      "includeFiles": "src/data/kap-snapshot.json"
+    },
+    "api/stock-quote.js": {
+      "maxDuration": 30
+    }
+  }
+}
