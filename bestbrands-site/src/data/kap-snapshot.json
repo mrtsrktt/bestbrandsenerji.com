@@ -1,0 +1,135 @@
+{
+  "items": [
+    {
+      "id": 1689913,
+      "title": "Sorumluluk Beyanı (Konsolide)",
+      "summary": "Sorumluluk Beyanı (Konsolide)",
+      "publishedAt": "30.10.2026 18:14:45",
+      "url": "https://kap.org.tr/tr/Bildirim/1689913",
+      "year": 2026,
+      "period": 3
+    },
+    {
+      "id": 1689910,
+      "title": "Faaliyet Raporu (Konsolide)",
+      "summary": "Faaliyet Raporu Konsolide",
+      "publishedAt": "30.10.2026 18:14:24",
+      "url": "https://kap.org.tr/tr/Bildirim/1689910",
+      "year": 2026,
+      "period": 3
+    },
+    {
+      "id": 1689906,
+      "title": "Finansal Rapor",
+      "summary": "",
+      "publishedAt": "30.10.2026 18:14:02",
+      "url": "https://kap.org.tr/tr/Bildirim/1689906",
+      "year": 2026,
+      "period": 3
+    },
+    {
+      "id": 1686757,
+      "title": "Kredi Derecelendirmesi",
+      "summary": "JCR KREDİ DERECELENDİRMESİ",
+      "publishedAt": "23.10.2026 15:55:22",
+      "url": "https://kap.org.tr/tr/Bildirim/1686757",
+      "year": null,
+      "period": null
+    },
+    {
+      "id": 1683800,
+      "title": "Genel Kurul İşlemlerine İlişkin Bildirim",
+      "summary": "13 Kasım 2026 Tarihinde Gerçekleştirilecek Olan Olağanüstü Genel Kurul Toplantısı Hakkında.",
+      "publishedAt": "19.10.2026 16:51:54",
+      "url": "https://kap.org.tr/tr/Bildirim/1683800",
+      "year": null,
+      "period": null
+    },
+    {
+      "id": 1675350,
+      "title": "Özel Durum Açıklaması (Genel)",
+      "summary": "Kamuoyuna ve Yatırımcılarımıza Duyuru",
+      "publishedAt": "07.10.2026 19:01:10",
+      "url": "https://kap.org.tr/tr/Bildirim/1675350",
+      "year": null,
+      "period": null
+    },
+    {
+      "id": 1675196,
+      "title": "Sermaye Artırımından Elde Edilecek - Edilen Fonun Kullanımına İlişkin Rapor",
+      "summary": "Halka Arzdan Elde Edilmiş Fonun Kullanım Yeri Değişikliği Hakkında",
+      "publishedAt": "07.10.2026 18:13:52",
+      "url": "https://kap.org.tr/tr/Bildirim/1675196",
+      "year": null,
+      "period": null
+    },
+    {
+      "id": 1664179,
+      "title": "Özel Durum Açıklaması (Genel)",
+      "summary": "Sürkit Holding A.Ş  Kayıtlı Sermaye Sistemine Geçiş Başvurusu Hakkında",
+      "publishedAt": "16.09.2026 18:01:11",
+      "url": "https://kap.org.tr/tr/Bildirim/1664179",
+      "year": null,
+      "period": null
+    },
+    {
+      "id": 1652708,
+      "title": "Halka Arz Fiyatının Belirlenmesinde Esas Alınan Varsayımlara İlişkin Değerlendirme Raporu",
+      "summary": "Halka Arz Fiyatının Belirlenmesinde Esas Alınan Varsayımlara İlişkin Değerlendirme Raporu",
+      "publishedAt": "19.08.2026 18:05:52",
+      "url": "https://kap.org.tr/tr/Bildirim/1652708",
+      "year": null,
+      "period": null
+    },
+    {
+      "id": 1652707,
+      "title": "Sermaye Artırımından Elde Edilecek - Edilen Fonun Kullanımına İlişkin Rapor",
+      "summary": "Sermaye Artırımından Elde Edilen Fonun Kullanın Yerlerine İlişkin Denetim Komitesi Raporu",
+      "publishedAt": "19.08.2026 18:05:34",
+      "url": "https://kap.org.tr/tr/Bildirim/1652707",
+      "year": null,
+      "period": null
+    },
+    {
+      "id": 1648862,
+      "title": "Katılım Finansı İlkeleri Bilgi Formu",
+      "summary": "",
+      "publishedAt": "12.08.2026 19:33:08",
+      "url": "https://kap.org.tr/tr/Bildirim/1648862",
+      "year": 2026,
+      "period": 2
+    },
+    {
+      "id": 1648859,
+      "title": "Sorumluluk Beyanı (Konsolide)",
+      "summary": "Sorumluluk Beyanı",
+      "publishedAt": "12.08.2026 19:32:18",
+      "url": "https://kap.org.tr/tr/Bildirim/1648859",
+      "year": 2026,
+      "period": 2
+    }
+  ],
+  "report": {
+    "financial": {
+      "id": 1689906,
+      "title": "Finansal Rapor",
+      "summary": "",
+      "publishedAt": "30.10.2026 18:14:02",
+      "url": "https://kap.org.tr/tr/Bildirim/1689906",
+      "year": 2026,
+      "period": 3
+    },
+    "activity": {
+      "id": 1689910,
+      "title": "Faaliyet Raporu (Konsolide)",
+      "summary": "Faaliyet Raporu Konsolide",
+      "publishedAt": "30.10.2026 18:14:24",
+      "url": "https://kap.org.tr/tr/Bildirim/1689910",
+      "year": 2026,
+      "period": 3
+    }
+  },
+  "checkedAt": "2026-11-06T16:43:24.143Z",
+  "source": "snapshot",
+  "sourceUrl": "https://kap.org.tr/tr/bildirim-sorgu-sonuc?member=8acae2c49b85f8ce019c0d9c2cc26b56"
+}

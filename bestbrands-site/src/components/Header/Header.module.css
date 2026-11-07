@@ -1,0 +1,270 @@
+/* Header Ana Konteyneri */
+.headerWrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--header-height);
+  z-index: 90;
+  background-color: transparent;
+  padding-right: var(--scrollbar-width, 0px);
+  box-sizing: border-box;
+}
+
+.onLightSection { background-color: rgba(255,255,255,.96); }
+.onLightSection .navButton,
+.onLightSection .navDirectLink,
+.onLightSection .navDirectLink:hover { color: #06184f; }
+.onLightSection .navChevron { stroke: #06184f; }
+.onLightSection .navButton span::before { background: #06184f; }
+.onLightSection .navButton:focus-visible { outline-color: #06184f; }
+.onLightSection .mobileMenuToggle { color: #06184f; background: rgba(255,255,255,.75); border-color: rgba(6,24,79,.2); }
+
+/* Editoryal Koyu Tema Header Zemin Katmanı (#111814) */
+.headerBg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--menu-bg);
+  pointer-events: none;
+  z-index: 1;
+  display: none;
+}
+
+@media (max-width: 960px) {
+  .headerBg {
+    display: block;
+    transform: translateY(-100%);
+    transition: transform var(--transition-fast);
+  }
+
+  .headerWrapper.isMobileOpen .headerBg {
+    transform: translateY(0);
+  }
+}
+
+.navContainer {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  padding: 0 clamp(32px, 2.5vw, 48px);
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  gap: 0 18px;
+  align-items: center;
+}
+
+/* Logo Alanı - 1-6. Sütunlar Arası */
+.logoLink {
+  grid-column: 1 / 7;
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  transition: opacity var(--transition-fast);
+}
+
+.logoLink:hover {
+  opacity: 0.88;
+}
+
+.logoImage {
+  width: 164px;
+  height: auto;
+  max-height: 64px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Masaüstü Navigasyon Listesi - 7. Sütundan Başlar (Kurumsal tam 7. sütuna oturur) */
+.desktopNavList {
+  grid-column: 7 / -1;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  height: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navItem {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* Menü Butonu (Kurumsal, Yatırımlarımız, Yatırımcı İlişkileri) */
+.navButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  font-family: var(--font-default);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--color-white);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.navButton:hover {
+  opacity: 0.85;
+}
+
+.navButton:focus {
+  outline: none;
+}
+
+.navButton:focus-visible {
+  outline: 2px solid var(--color-white);
+  outline-offset: 4px;
+}
+
+/* Stellar 1:1 Nav Button Hover & Active Underline */
+.navButton span {
+  position: relative;
+  z-index: 3;
+}
+
+.navButton span::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 105%;
+  width: 100%;
+  height: 1px;
+  background: var(--color-white);
+  transform: scaleX(0);
+  transform-origin: 100% 50%;
+  transition: transform 0.42s cubic-bezier(0.28, 0.11, 0.32, 1);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.navButton:hover span::before,
+.navButton.isActive span::before {
+  transform: scaleX(1);
+  transform-origin: 0% 50%;
+}
+
+/* Küçük Yön Oku - Zarif ve minimal */
+.navChevron {
+  width: 11px;
+  height: 11px;
+  stroke: var(--color-white);
+  opacity: 0.7;
+  transition: transform 220ms ease, opacity var(--transition-fast);
+}
+
+.navButton:hover .navChevron,
+.navButton.isActive .navChevron {
+  opacity: 1;
+}
+
+.navChevron.isFlipped {
+  transform: rotate(180deg);
+}
+
+/* İnce Aktif Çizgi kaldırıldı - Stellar span::before underline kullanır */
+.activeIndicator {
+  display: none;
+}
+
+@keyframes indicatorScaleIn {
+  from {
+    opacity: 0;
+    transform: scaleX(0.3);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+/* Direkt Bağlantı (Basın Odası, İletişim) - Çapraz oklar kaldırıldı */
+.navDirectLink {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--menu-text-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.navDirectLink:hover {
+  color: var(--color-white);
+}
+
+.navDirectLink:focus {
+  outline: none;
+}
+
+.navDirectLink:focus-visible {
+  outline: 2px solid var(--brand-green);
+  outline-offset: 4px;
+}
+
+/* Mobil Hamburger Butonu */
+.mobileMenuToggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 8px;
+  border-radius: 4px;
+  color: var(--menu-text-primary);
+  background-color: rgba(17, 24, 20, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.mobileMenuToggle:hover {
+  background-color: rgba(17, 24, 20, 0.85);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.hamburgerIcon {
+  width: 22px;
+  height: 22px;
+}
+
+/* Tablet & Mobil Breakpoint */
+@media (max-width: 960px) {
+  .headerWrapper {
+    height: var(--header-height-mobile);
+  }
+
+  .navContainer {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 var(--container-padding-mobile);
+  }
+
+  .desktopNavList {
+    display: none;
+  }
+
+  .mobileMenuToggle {
+    display: inline-flex;
+  }
+
+  .logoImage {
+    width: 120px;
+  }
+}

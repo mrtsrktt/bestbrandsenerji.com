@@ -1,0 +1,249 @@
+/* Mobil Menü Konteyneri - Editoryal Koyu Tema (#111814) */
+.mobileDrawer {
+  position: fixed;
+  top: var(--header-height-mobile);
+  left: 0;
+  width: 100%;
+  height: calc(100dvh - var(--header-height-mobile));
+  background-color: var(--menu-bg);
+  z-index: 99;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 24px var(--container-padding-mobile) 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transform: translateY(-100%);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform var(--transition-panel-open),
+    opacity var(--transition-panel-open),
+    visibility var(--transition-panel-open);
+}
+
+.mobileDrawer.isOpen {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.navSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.accordionGroup {
+  border-bottom: 1px solid var(--menu-border-subtle);
+}
+
+/* Akordeon Butonu - Kutusuz, Sade Editoryal Başlık */
+.accordionHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  background: transparent;
+  border: none;
+  color: var(--menu-text-primary);
+  font-size: 1.125rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  min-height: 48px;
+  transition: color var(--transition-fast);
+}
+
+.accordionHeader:hover,
+.accordionHeader.isHeaderActive {
+  color: var(--color-white);
+}
+
+.accordionChevron {
+  width: 18px;
+  height: 18px;
+  stroke: var(--menu-text-muted);
+  transition: transform 220ms ease, stroke var(--transition-fast);
+}
+
+.accordionHeader.isHeaderActive .accordionChevron {
+  stroke: var(--brand-green);
+  transform: rotate(180deg);
+}
+
+/* Akordeon Gövdesi - Kapalıyken display:none ile Tab sırasından tamamen çıkarılır */
+.accordionBody {
+  display: none;
+  padding: 8px 0 20px 12px;
+}
+
+.accordionBody.isExpanded {
+  display: block;
+}
+
+/* Akordeon İçi Linkler - Kutusuz, Temiz Tipografi */
+.subLinkList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.subLinkItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  color: var(--menu-text-primary);
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  min-height: 44px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.subLinkItem:hover,
+.subLinkItem:active {
+  color: var(--color-white);
+  transform: translateX(4px);
+}
+
+.linkArrow {
+  font-size: 1rem;
+  color: var(--brand-green);
+  opacity: 0.85;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.subLinkItem:hover .linkArrow {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+.cardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cardItemTitle {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--menu-text-primary);
+}
+
+.cardItemSubtitle {
+  font-size: 0.75rem;
+  color: var(--brand-green);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.allInvestmentsMobileLink {
+  margin-top: 6px;
+  color: var(--menu-text-primary);
+  font-weight: 600;
+  border-bottom: none;
+}
+
+.disabledLinkItem {
+  color: var(--menu-text-dimmed);
+  cursor: default;
+}
+
+.badge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border: 1px solid var(--menu-border-subtle);
+  border-radius: 2px;
+  color: var(--menu-text-muted);
+}
+
+/* Direkt Linkler (Basın Odası, İletişim) */
+.directLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  color: var(--menu-text-primary);
+  font-size: 1.125rem;
+  font-weight: 500;
+  text-decoration: none;
+  min-height: 48px;
+  border-bottom: 1px solid var(--menu-border-subtle);
+  transition: color var(--transition-fast);
+}
+
+.directLink:hover,
+.directLink:active {
+  color: var(--color-white);
+}
+
+/* Mobil Alt Bölüm (İletişim & Sosyal) - Sade ve Minimalist */
+.mobileFooter {
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px solid var(--menu-border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mobileContactItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--menu-text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  min-height: 44px;
+  transition: color var(--transition-fast);
+}
+
+.mobileContactItem:hover {
+  color: var(--menu-text-primary);
+}
+
+.mobileSocialRow {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.mobileSocialBtn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--menu-border-subtle);
+  border-radius: 4px;
+  color: var(--menu-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  min-height: 44px;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.mobileSocialBtn:hover,
+.mobileSocialBtn:active {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--color-white);
+}
+
+@media (min-width: 961px) {
+  .mobileDrawer {
+    display: none;
+  }
+}

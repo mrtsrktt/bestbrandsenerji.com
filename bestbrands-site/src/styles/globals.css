@@ -1,0 +1,104 @@
+@import './variables.css';
+
+/* =========================================================
+   Stellar Management 1:1 Orijinal Web Font Tanımları
+   General Sans Variable & Playfair Display
+   ========================================================= */
+@font-face {
+  font-family: 'General Sans Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/GeneralSans-Variable.woff2') format('woff2'),
+       url('/fonts/GeneralSans-Variable.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/PlayfairDisplay-MediumItalic.woff2') format('woff2'),
+       url('/fonts/PlayfairDisplay-MediumItalic.woff') format('woff');
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-family-base);
+  color: var(--color-text-dark);
+  background-color: #0b110e;
+  line-height: 1.5;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Arka Plan Scroll Kilidi (Mega Menü açıkken sıçramasız scroll engelleme) */
+body.scroll-locked {
+  overflow: hidden !important;
+  padding-right: var(--scrollbar-width, 0px);
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+/* Erişilebilirlik Yardımcısı: Screen Reader Only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Klavye Odağı - Evrensel Belirgin Focus */
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Reduced Motion Kullanıcı Tercihi - Mega menü GSAP motoru tarafından yönetilir */
+@media (prefers-reduced-motion: reduce) {
+  *:not(#megamenu-root):not(#megamenu-root *), 
+  *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,6 +1,38 @@
 node_modules/
 dist/
+dist-*/
 .DS_Store
 *.log
 outputs/
 /hermes/
+
+# Local/editor/runtime state
+.openai/
+.codex/
+.agents/
+.runtime/
+.vscode/
+.idea/
+*.local
+*.tmp
+*.temp
+
+# Secrets and local credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+secrets*.json
+
+# Generated proofs, analysis captures and export bundles
+/cinematic-proof/
+/flow-antigravity-package/
+/reference-analysis/
+/bestbrands-flow-antigravity-v1.zip
+/screenshots/
+/coverage/
+/vite.hermes.config.js

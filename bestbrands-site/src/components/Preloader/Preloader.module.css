@@ -1,0 +1,70 @@
+/* =========================================================
+   Best Brands Enerji - Premium Opening Logo Animation
+   Stellar Management 1:1 Cinematic Preloader & Logo Architecture
+   ========================================================= */
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+/* Ana intro zemini: resmi Best Brands logosundan ölçülen kurumsal yeşil */
+.preloaderCurtain {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #3f693e;
+  z-index: 2;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.preloaderBackdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #3f693e;
+  z-index: 1;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+/* 3. Logo Kapsayıcısı: Ekranın tam ortasında konumlanır */
+.logoWrapper {
+  position: relative;
+  z-index: 3;
+  width: clamp(288px, 28.8vw, 432px);
+  aspect-ratio: 600 / 299;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.logoSvg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+/* Global scroll kilidi */
+:global(html.preloader-active) {
+  height: 100%;
+  overflow-y: scroll;
+}
+
+:global(html.preloader-active body) {
+  height: 100%;
+  overflow: hidden;
+}

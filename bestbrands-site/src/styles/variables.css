@@ -1,0 +1,48 @@
+:root {
+  /* Marka Renkleri */
+  --brand-green: #00AA3E;
+  --brand-green-hover: #009335;
+  --brand-green-dark: #006625;
+  --brand-green-light: #e6f7ec;
+
+  /* Menü & Header Editoryal Koyu Tema - Stellar Management 1:1 Dark Navy (#06184f) */
+  --dark-blue: #06184f;
+  --menu-bg: #06184f;
+  --menu-text-primary: #ffffff;
+  --menu-text-muted: #9e9e9e;
+  --menu-text-dimmed: #727272;
+  --menu-border-subtle: rgba(255, 255, 255, 0.12);
+
+  /* Nötr Tonlar */
+  --color-white: #ffffff;
+  --color-off-white: #f7f9f7;
+  --color-surface-soft: #f0f4f1;
+  --color-border-subtle: rgba(0, 0, 0, 0.08);
+  --color-border-green: rgba(255, 255, 255, 0.22);
+  --color-text-dark: #121914;
+  --color-text-muted: #526055;
+  --color-text-light: #ffffff;
+  --color-text-light-muted: rgba(255, 255, 255, 0.82);
+
+  /* Boyutlar ve Boşluklar */
+  --header-height: 100px;
+  --header-height-mobile: 76px;
+  --container-max-width: 1440px;
+  --container-padding: 56px;
+  --container-padding-mobile: 20px;
+
+  /* Tipografi - Stellar Management 1:1 */
+  --font-family-base: 'General Sans Variable', Arial, sans-serif;
+  --font-default: 'General Sans Variable', Arial, sans-serif;
+  --font-italic: 'Playfair Display', serif;
+  
+  /* Geçişler */
+  --transition-fast: 180ms ease;
+  --transition-panel-open: 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-panel-close: 200ms ease-in;
+  --transition-content: 280ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Odak ve Erişilebilirlik */
+  --focus-ring: 2px solid var(--brand-green);
+  --focus-ring-offset: 3px;
+}

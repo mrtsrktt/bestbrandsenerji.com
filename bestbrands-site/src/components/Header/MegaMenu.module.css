@@ -1,0 +1,507 @@
+/* =========================================================
+   Mega Menü Panel Konteyner & Hareket Katmanları
+   Tek Animasyon Yöneticisi: GSAP (myEase: 0.28, 0.11, 0.32, 1)
+   Editoryal Koyu Tema (#111814)
+   ========================================================= */
+
+/* Kök Taşıyıcı: Header arkasından başlar (top: 0), açıkken görünür, kapalıyken tık/odak almaz */
+.menuRoot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  visibility: hidden;
+  z-index: 5;
+}
+
+.menuRoot.isVisible {
+  visibility: visible;
+}
+
+.menuRoot.isInteractive {
+  pointer-events: auto;
+}
+
+/* Stellar Management 1:1 Sabit Arka Plan Katmanı (.modal-bg) */
+.modalBg {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 4;
+  pointer-events: auto;
+}
+
+/* Kırpma Maskesi: Header arkasındaki taşmaları yukarıdan kırpar, alt gölgeyi korur */
+.menuMask {
+  position: relative;
+  width: 100%;
+  clip-path: inset(0 -40px -80px -40px);
+}
+
+/* Koyu Panel Yüzeyi: Header arkasından yukarıdan aşağı kayan kesintisiz tek zemin (#111814) */
+.menuWrapper {
+  position: relative;
+  width: 100%;
+  background-color: var(--menu-bg);
+  color: var(--menu-text-primary);
+  border-bottom: 1px solid var(--menu-border-subtle);
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.45);
+  pointer-events: auto;
+  will-change: transform;
+  z-index: 5;
+  max-height: calc(100vh - var(--header-height));
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Header Arkası Zemin Boşluğu: Header navigation elemanlarının arkasını tam 72px kaplar */
+.surfaceHeaderBackdrop {
+  width: 100%;
+  height: var(--header-height);
+  pointer-events: none;
+}
+
+/* Dinamik Yükseklik Konteyneri: Menü değişimlerinde yüksekliği GSAP ile akıcı biçimde yönetir */
+.heightContainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  height: 0;
+  will-change: height;
+}
+
+/* İçerik Konteyneri: 3 kalıcı panel kabuğunu barındırır */
+.panelsContainer {
+  position: relative;
+  width: 100%;
+}
+
+/* Sabit DOM Panel Kabuğu: Her 3 panel kalıcı olarak mounted tutulur; re-mount yapılmaz */
+.panelShell {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+  will-change: opacity, transform;
+}
+
+.innerWrap {
+  width: 100%;
+  padding: 40px clamp(32px, 2.5vw, 48px) 48px;
+}
+
+/* =========================================================
+   1. KURUMSAL PANEL - Stellar Management 1:1 Clean Vertical List
+   16 Kolonlu Izgara Sistemi (7. Kolondan Başlar)
+   ========================================================= */
+.menuGrid {
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  gap: 0 18px;
+  width: 100%;
+  padding: 40px clamp(32px, 2.5vw, 48px) 0;
+  box-sizing: border-box;
+}
+
+.corporateMenuColumn {
+  grid-column: 7 / 12;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14.4px;
+}
+
+.menuGridItem {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.titleLink {
+  display: inline-block;
+  font-family: var(--font-default);
+  font-size: 21.6px;
+  font-weight: 500;
+  line-height: 150%; /* 32.4px */
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  text-decoration: none;
+  transition: opacity 0.42s cubic-bezier(0.28, 0.11, 0.32, 1);
+}
+
+.titleLink span {
+  position: relative;
+  z-index: 3;
+}
+
+/* Stellar 1:1 Signature Underline Animation: Sol-Sağ Ölçeklenme */
+.titleLink span::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 105%;
+  width: 100%;
+  height: 1px;
+  background: #ffffff;
+  transform: scaleX(0);
+  transform-origin: 100% 50%;
+  transition: transform 0.42s cubic-bezier(0.28, 0.11, 0.32, 1);
+  pointer-events: none;
+  z-index: -1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .titleLink:hover span::before {
+    transform: scaleX(1);
+    transform-origin: 0% 50%;
+  }
+}
+
+/* =========================================================
+   2. YATIRIMLARIMIZ PANEL (İki Büyük Görsel Kart)
+   ========================================================= */
+.investmentsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.investmentVisualCard {
+  position: relative;
+  height: 340px;
+  border-radius: 4px;
+  overflow: hidden;
+  text-decoration: none;
+  background-color: #0c120e;
+}
+
+.cardImageContainer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1);
+  transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.investmentVisualCard:hover .cardImage {
+  transform: scale(1.035);
+}
+
+.cardBottomGradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(17, 24, 20, 0) 30%,
+    rgba(17, 24, 20, 0.72) 70%,
+    rgba(17, 24, 20, 0.94) 100%
+  );
+  pointer-events: none;
+}
+
+.cardContent {
+  position: absolute;
+  bottom: 24px;
+  left: 28px;
+  right: 28px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cardSubtitle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--brand-green);
+}
+
+.cardTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cardTitle {
+  font-size: 1.5rem; /* ~24px */
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--menu-text-primary);
+  margin: 0;
+}
+
+.cardHoverArrow {
+  font-size: 1.25rem;
+  color: var(--brand-green);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.investmentVisualCard:hover .cardHoverArrow,
+.investmentVisualCard:focus-visible .cardHoverArrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Tüm Yatırımlarımız Sade Metin Bağlantısı */
+.allInvestmentsRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--menu-border-subtle);
+}
+
+.allInvestmentsLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--menu-text-muted);
+  text-decoration: none;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.allInvestmentsLink:hover {
+  color: var(--menu-text-primary);
+  transform: translateX(4px);
+}
+
+.allInvestmentsLink:hover span:last-child {
+  color: var(--brand-green);
+}
+
+/* =========================================================
+   3. YATIRIMCI İLİŞKİLERİ (3 Sütun, Dikey Ayırıcılar)
+   ========================================================= */
+.investorColumnsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+
+.investorColumn {
+  padding: 0 40px;
+  border-right: 1px solid var(--menu-border-subtle);
+}
+
+.investorColumn:first-child {
+  padding-left: 0;
+}
+
+.investorColumn:last-child {
+  border-right: none;
+  padding-right: 0;
+}
+
+.investorColHeader {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--menu-text-muted);
+  margin-bottom: 22px;
+}
+
+.investorLinkList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.investorLinkItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 1.0625rem; /* ~17px */
+  font-weight: 500;
+  color: var(--menu-text-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.investorLinkLabel {
+  position: relative;
+  display: inline-block;
+  transition: color var(--transition-fast);
+}
+
+.investorLinkArrow {
+  font-size: 1rem;
+  color: var(--brand-green);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.investorLinkItem:hover,
+.investorLinkItem:focus-visible {
+  color: var(--color-white);
+  transform: translateX(4px);
+}
+
+.investorLinkItem:hover .investorLinkArrow,
+.investorLinkItem:focus-visible .investorLinkArrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.investorDisabledItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--menu-text-dimmed);
+  cursor: default;
+}
+
+.badge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--menu-text-muted);
+  padding: 2px 6px;
+  border: 1px solid var(--menu-border-subtle);
+  border-radius: 2px;
+}
+
+/* =========================================================
+   Stellar Management 1:1 Alt İletişim & Sosyal Medya Barı (.menu-bottom)
+   ========================================================= */
+.menuBottom {
+  width: 100%;
+  background-color: transparent;
+  box-sizing: border-box;
+}
+
+.menuBottomInner {
+  width: 100%;
+  margin: 57.6px 0 32.4px;
+  padding: 0 clamp(32px, 2.5vw, 48px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.socials {
+  display: flex;
+  align-items: center;
+  gap: 21.6px;
+}
+
+.socialItem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  text-decoration: none;
+  transition: opacity 0.42s cubic-bezier(0.28, 0.11, 0.32, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .socialItem:hover {
+    opacity: 0.8;
+  }
+}
+
+.socialSvg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.contactLink {
+  display: inline-block;
+  font-family: var(--font-default);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: 0;
+  color: #ffffff;
+  text-decoration: none;
+  transition: color 0.42s cubic-bezier(0.28, 0.11, 0.32, 1);
+}
+
+.contactLink span {
+  position: relative;
+  z-index: 3;
+}
+
+.contactLink span::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 105%;
+  width: 100%;
+  height: 1px;
+  background: #ffffff;
+  transform: scaleX(0);
+  transform-origin: 100% 50%;
+  transition: transform 0.42s cubic-bezier(0.28, 0.11, 0.32, 1);
+  pointer-events: none;
+  z-index: -1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .contactLink:hover span::before {
+    transform: scaleX(1);
+    transform-origin: 0% 50%;
+  }
+}
+
+.footerSocialLink:hover {
+  color: var(--menu-text-primary);
+  transform: translateX(2px);
+}
+
+.footerSocialLink span:last-child {
+  color: var(--brand-green);
+}
+
+/* Tablet Uyarlaması */
+@media (max-width: 1024px) {
+  .innerWrap {
+    padding: 32px 32px 40px;
+  }
+
+  .corporateGrid {
+    gap: 32px;
+  }
+
+  .corporateEditorialLink {
+    font-size: 1.375rem;
+  }
+
+  .corporateVisualCard,
+  .investmentVisualCard {
+    height: 280px;
+  }
+
+  .investorColumn {
+    padding: 0 24px;
+  }
+}

@@ -1,0 +1,398 @@
+/* Hero Bölüm Konteyneri */
+.heroSection {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 600px;
+  background-color: #0c120e;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Video ve Poster Ortak Kapsayıcı */
+.videoContainer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Hero Video */
+.videoElement {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+}
+
+/* Poster Görseli */
+.posterImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  z-index: 1;
+}
+
+/* Üst Gradyan Katmanı - Yalnızca Header okunurluğu için sınırlı üst koyulaştırma */
+.overlayScrim {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 140px;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Alt Gradyan Katmanı - Tipografi okunurluğu ve sinematik derinlik */
+.bottomScrim {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: clamp(260px, 45vh, 520px);
+  background: linear-gradient(
+    0deg,
+    rgba(12, 18, 14, 0.78) 0%,
+    rgba(12, 18, 14, 0.42) 42%,
+    rgba(12, 18, 14, 0) 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* =========================================================
+   STELLAR MANAGEMENT 1:1 EDİTORYAL SOL ALT TİPOGRAFİ
+   General Sans Variable (Medium 500) + Playfair Display (Medium Italic 500)
+   ========================================================= */
+.heroEditorial {
+  position: absolute;
+  bottom: clamp(32px, 2.5vw, 48px);
+  left: clamp(32px, 2.5vw, 48px);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 2.25vw, 36px);
+  max-width: clamp(280px, 55vw, 840px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.heroTitle {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-default);
+  font-size: clamp(44px, 5.625vw, 108px);
+  font-weight: 500;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  color: #ffffff;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.heroTitleLineWrap {
+  display: block;
+  overflow: hidden;
+  line-height: 0.92;
+  /* Playfair'in "g" gibi derin alt uzantıları maske tarafından kırpılmasın. */
+  padding-bottom: 0.22em;
+  margin-bottom: -0.22em;
+}
+
+.heroTitleLine {
+  display: block;
+  transform: translateY(115%);
+  transition: transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.isRevealed .heroTitleLineWrap:nth-child(1) .heroTitleLine {
+  transform: translateY(0%);
+  transition-delay: 0.08s;
+}
+
+.isRevealed .heroTitleLineWrap:nth-child(2) .heroTitleLine {
+  transform: translateY(0%);
+  transition-delay: 0.2s;
+}
+
+.isRevealed .heroTitleLineWrap:nth-child(3) .heroTitleLine {
+  transform: translateY(0%);
+  transition-delay: 0.32s;
+}
+
+.heroTitleItalic {
+  font-family: var(--font-italic);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  padding-right: 0.06em; /* İtalik harfin sağ kenar taşmasını korur */
+}
+
+.heroDescription {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-default);
+  font-size: clamp(14px, 1.125vw, 21.6px);
+  font-weight: 450;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.92);
+  max-width: clamp(260px, 24vw, 420px);
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: 0.44s;
+  will-change: opacity, transform;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.isRevealed .heroDescription {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =========================================================
+   HERO KONTROLLERİ - SADE VE EDİTORYAL GÖRSEL AİLE
+   ========================================================= */
+
+/* Autoplay Engellendiğinde Merkezde ~64px Dairesel Buton */
+.manualPlayCenter {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 10;
+  background-color: transparent;
+  pointer-events: auto;
+}
+
+.circularPlayButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: rgba(17, 24, 20, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: var(--color-white);
+  cursor: pointer;
+  transition:
+    transform var(--transition-fast),
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.circularPlayButton:hover {
+  transform: scale(1.06);
+  background-color: rgba(17, 24, 20, 0.85);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.circularPlayIcon {
+  width: 22px;
+  height: 22px;
+  margin-left: 2px; /* Dengeleme */
+}
+
+.circularPlayLabel {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--menu-text-primary);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Sağ Alt Duraklat/Devam Kontrolü (Sol altı editoryal metne bırakır) */
+.playbackControls {
+  position: absolute;
+  bottom: clamp(32px, 2.5vw, 48px);
+  right: clamp(32px, 2.5vw, 48px);
+  z-index: 10;
+}
+
+.controlButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background-color: rgba(17, 24, 20, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 4px;
+  color: var(--menu-text-primary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.controlButton:hover {
+  background-color: rgba(17, 24, 20, 0.88);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: var(--color-white);
+}
+
+.controlIcon {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+/* Sağ Alt Tekrar İzle Butonu */
+.replayButtonWrap {
+  position: absolute;
+  bottom: clamp(32px, 2.5vw, 48px);
+  right: clamp(32px, 2.5vw, 48px);
+  z-index: 10;
+  animation: replayFadeIn 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes replayFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.replayButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background-color: rgba(17, 24, 20, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 4px;
+  color: var(--menu-text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.replayButton:hover {
+  background-color: rgba(17, 24, 20, 0.95);
+  border-color: var(--brand-green);
+  color: var(--color-white);
+  transform: translateY(-1px);
+}
+
+.replayIcon {
+  width: 16px;
+  height: 16px;
+  stroke: var(--brand-green);
+}
+
+/* Video Hata Bildirimi */
+.errorStateMessage {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(17, 24, 20, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--menu-text-primary);
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  z-index: 10;
+}
+
+/* Tablet & Mobil Düzenlemeler */
+@media (max-width: 960px) {
+  .heroEditorial {
+    bottom: clamp(24px, 4vw, 36px);
+    left: clamp(20px, 3vw, 32px);
+    gap: 20px;
+    max-width: calc(100% - 130px);
+  }
+
+  .heroTitle {
+    font-size: clamp(38px, 6.5vw, 56px);
+  }
+
+  .heroDescription {
+    font-size: clamp(13.5px, 1.8vw, 16px);
+    max-width: 360px;
+  }
+
+  .playbackControls {
+    bottom: clamp(20px, 3vw, 32px);
+    right: clamp(20px, 3vw, 32px);
+  }
+
+  .replayButtonWrap {
+    bottom: clamp(20px, 3vw, 32px);
+    right: clamp(20px, 3vw, 32px);
+  }
+}
+
+@media (max-width: 640px) {
+  .heroEditorial {
+    bottom: clamp(76px, 11vh, 92px);
+    left: 20px;
+    gap: 16px;
+    max-width: calc(100% - 40px);
+  }
+
+  .heroTitle {
+    font-size: clamp(32px, 8.5vw, 44px);
+  }
+
+  .heroDescription {
+    font-size: 13.5px;
+    line-height: 1.45;
+    max-width: 310px;
+  }
+
+  .playbackControls {
+    bottom: 20px;
+    right: 20px;
+  }
+
+  .replayButtonWrap {
+    bottom: 20px;
+    right: 20px;
+  }
+}
