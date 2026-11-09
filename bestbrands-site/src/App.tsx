@@ -9,6 +9,7 @@ import { Footer } from './components/Footer/Footer';
 import { InvestorRelations } from './components/InvestorRelations/InvestorRelations';
 import { StockTicker } from './components/StockTicker/StockTicker';
 import { NetworkMap } from './components/NetworkMap/NetworkMap';
+import { PressRoom } from './components/PressRoom/PressRoom';
 
 export const App: React.FC = () => {
   const [isRevealed, setIsRevealed] = useState<boolean>(false);
@@ -28,6 +29,7 @@ export const App: React.FC = () => {
         <NetworkMap />
         <InvestorRelations />
         <StockTicker />
+        <PressRoom />
         <ContactCta />
       </main>
       <Footer />
