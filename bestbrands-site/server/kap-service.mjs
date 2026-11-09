@@ -1,7 +1,6 @@
-import { readFile } from 'node:fs/promises';
+import seed from '../src/data/kap-snapshot.json' with { type: 'json' };
 
 export const KAP_SOURCE = 'https://kap.org.tr/tr/bildirim-sorgu-sonuc?member=8acae2c49b85f8ce019c0d9c2cc26b56';
-const seed = JSON.parse(await readFile(new URL('../src/data/kap-snapshot.json', import.meta.url), 'utf8'));
 
 function readObject(text, start) {
   let depth = 0, quoted = false, escaped = false;
