@@ -83,7 +83,7 @@ export function createStockService({ fetchImpl = fetch, now = () => new Date(), 
   };
 }
 // Vercel deployment files are read-only; temporary cache belongs in /tmp.
-const runtime = process.env.VERCEL
+const runtime = process.env.VERCEL || process.env.NETLIFY
   ? new URL('file:///tmp/bestbrands-runtime/')
   : new URL('../.runtime/', import.meta.url);
 const cacheFile = new URL('stock-quote.json', runtime);
